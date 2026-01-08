@@ -10,23 +10,31 @@ import SwiftData
 
 @main
 struct ListApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+	var sharedModelContainer: ModelContainer = {
+		let schema = Schema([
+			Item.self,
+		])
+		let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
 
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-        .modelContainer(sharedModelContainer)
-    }
+		do {
+			let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+			if let text = Loader().loadTextFileFromBundle(filename: "PreviewItems", withExtension: "txt") {
+				text.enumerateLines { line, stop in
+					let new = Item(text: line)
+					container.mainContext.insert(new)
+				}
+			}
+			return container
+		} catch {
+			fatalError("Could not create ModelContainer: \(error)")
+		}
+	}()
+
+	var body: some Scene {
+		WindowGroup {
+			ContentView()
+		}
+		.modelContainer(sharedModelContainer)
+	}
 }
