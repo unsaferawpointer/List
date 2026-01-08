@@ -37,10 +37,12 @@ struct ContentView: View {
 				} else {
 					List(selection: $selection) {
 						ForEach(items) { item in
-							HStack(spacing: 8) {
-								Circle()
-									.foregroundStyle(item.isCompleted ? .secondary : .primary)
-									.frame(width: 4, height: 4)
+							HStack(spacing: 16) {
+								if editMode != .active {
+									Circle()
+										.foregroundStyle(item.isCompleted ? .secondary : .primary)
+										.frame(width: 4, height: 4)
+								}
 								Text(item.text)
 									.foregroundStyle(item.isCompleted ? .secondary : .primary)
 									.lineLimit(2)
