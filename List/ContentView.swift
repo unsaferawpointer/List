@@ -13,6 +13,7 @@ struct ContentView: View {
 	@State private var editMode: EditMode = .inactive
 
 	@Environment(\.modelContext) private var modelContext
+	@Environment(\.undoManager) private var undoManager
 	@Query(filter: nil, sort: \Item.index, animation: .default) private var items: [Item]
 
 	let model = ContentModel()
@@ -85,44 +86,69 @@ struct ContentView: View {
 				}
 			}
 			.toolbar {
-				#if os(iOS)
-				ToolbarItem(placement: .navigationBarTrailing) {
-					EditButton()
-				}
-				ToolbarItem(placement: .bottomBar) {
-					Spacer()
-				}
-				ToolbarItem(placement: .bottomBar) {
-					if editMode == .active {
-						Menu {
-							Toggle(
-								sources: completionSources(for: selection, in: items),
-								isOn: \.self
-							) {
-								Text("Completed")
-							}
-							Divider()
-							Button(role: .destructive) {
-								deleteSelectedItems()
-							} label: {
-								Label("Delete", systemImage: "trash")
-							}
-						} label: {
-							Label("Edit...", systemImage: "ellipsis")
-						}
-						.disabled(selection.isEmpty)
-					} else {
-						Button {
-							addItem()
-						} label: {
-							Label("Add Item", systemImage: "plus")
-						}
-					}
-				}
-				#endif
+				buildToolbar()
 			}
 			.environment(\.editMode, $editMode)
 		}
+	}
+}
+
+// MARK: - Builders
+extension ContentView {
+
+	@ToolbarContentBuilder
+	func buildToolbar() -> some ToolbarContent {
+		#if os(iOS)
+		ToolbarItem(placement: .navigationBarTrailing) {
+			EditButton()
+		}
+		if editMode != .active {
+			ToolbarItemGroup(placement: .bottomBar) {
+				Button {
+					undoManager?.undo()
+				} label: {
+					Label("Undo", systemImage: "arrow.uturn.backward")
+				}
+				.disabled(undoManager?.canUndo == false)
+				Button {
+					undoManager?.redo()
+				} label: {
+					Label("Redo", systemImage: "arrow.uturn.forward")
+				}
+				.disabled(undoManager?.canRedo == false)
+			}
+		}
+		ToolbarItem(placement: .bottomBar) {
+			Spacer()
+		}
+		ToolbarItem(placement: .bottomBar) {
+			if editMode == .active {
+				Menu {
+					Toggle(
+						sources: completionSources(for: selection, in: items),
+						isOn: \.self
+					) {
+						Text("Completed")
+					}
+					Divider()
+					Button(role: .destructive) {
+						deleteSelectedItems()
+					} label: {
+						Label("Delete", systemImage: "trash")
+					}
+				} label: {
+					Label("Edit...", systemImage: "ellipsis")
+				}
+				.disabled(selection.isEmpty)
+			} else {
+				Button {
+					addItem()
+				} label: {
+					Label("Add Item", systemImage: "plus")
+				}
+			}
+		}
+		#endif
 	}
 }
 
