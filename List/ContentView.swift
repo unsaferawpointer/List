@@ -14,7 +14,15 @@ struct ContentView: View {
 
 	@Environment(\.modelContext) private var modelContext
 	@Environment(\.undoManager) private var undoManager
-	@Query(filter: nil, sort: \Item.index, animation: .default) private var items: [Item]
+	@Query(
+		filter: nil,
+		sort:
+			[
+				SortDescriptor(\Item.index, order: .forward),
+				SortDescriptor(\Item.timestamp, order: .forward)
+			],
+		animation: .default
+	) private var items: [Item]
 
 	let model = ContentModel()
 
@@ -29,7 +37,7 @@ struct ContentView: View {
 	var body: some View {
 		NavigationStack {
 			Group {
-				if items.isEmpty {
+				if model.shouldContentUnavailableView(for: items) {
 					ContentUnavailableView(
 						"No Items",
 						systemImage: "shippingbox",
@@ -38,23 +46,9 @@ struct ContentView: View {
 				} else {
 					List(selection: $selection) {
 						ForEach(items) { item in
-							HStack(spacing: 16) {
-								if editMode != .active {
-									Circle()
-										.foregroundStyle(item.isCompleted ? .secondary : .primary)
-										.frame(width: 4, height: 4)
-								}
-								Text(item.text)
-									.foregroundStyle(item.isCompleted ? .secondary : .primary)
-									.lineLimit(2)
-									.strikethrough(item.isCompleted)
-							}
+							ItemView(isEditing: editMode == .active, item: item)
 							.contextMenu {
-								Toggle(isOn: .init(get: {
-									item.isCompleted
-								}, set: { newValue in
-									item.isCompleted = newValue
-								})) {
+								Toggle(isOn: item.isOn) {
 									Text("Completed")
 								}
 								Divider()
@@ -72,8 +66,7 @@ struct ContentView: View {
 					.listStyle(.insetGrouped)
 				}
 			}
-			.navigationTitle("All Items")
-			.navigationSubtitle(editMode == .active ? "\(selection.count) Items Selected" : "\(items.count) Items")
+			.navigationTitle(model.navigationTitle(isEditMode: editMode == .active, selection: selection))
 			.sheet(isPresented: $isPresented) {
 				ItemDetails(title: "New Item", text: "") { newText in
 					withAnimation {

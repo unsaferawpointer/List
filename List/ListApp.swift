@@ -19,9 +19,12 @@ struct ListApp: App {
 			switch result {
 			case let .success(container):
 				if let text = Loader().loadTextFileFromBundle(filename: "PreviewItems", withExtension: "txt") {
+					var index = 0
 					text.enumerateLines { line, stop in
 						let new = Item(text: line)
+						new.index = index
 						container.mainContext.insert(new)
+						index += 1
 					}
 				}
 			case .failure:

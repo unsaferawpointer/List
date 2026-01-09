@@ -15,16 +15,29 @@ final class Item {
 
 	var text: String
 
-	var isCompleted: Bool
+	var rawStatus: UInt8
 
 	var index: Int
 
 	// MARK: - Initialization
 
-	init(timestamp: Date = .now, text: String, isCompleted: Bool = false, index: Int = 0) {
+	init(timestamp: Date = .now, text: String, rawStatus: UInt8 = Status.incomplete.rawValue, index: Int = 0) {
 		self.timestamp = timestamp
 		self.text = text
-		self.isCompleted = isCompleted
+		self.rawStatus = rawStatus
 		self.index = index
+	}
+}
+
+// MARK: - Computed Properties
+extension Item {
+
+	var isCompleted: Bool {
+		get {
+			Status(rawValue: rawStatus) == .done
+		}
+		set {
+			rawStatus = newValue ? Status.done.rawValue : Status.incomplete.rawValue
+		}
 	}
 }
