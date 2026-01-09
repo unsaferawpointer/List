@@ -164,20 +164,13 @@ private extension ContentView {
 			for item in filtered {
 				modelContext.delete(item)
 			}
+			editMode = .inactive
 		}
 	}
 
 	func deleteItem(item: Item) {
 		withAnimation {
 			modelContext.delete(item)
-		}
-	}
-
-	func deleteItems(offsets: IndexSet) {
-		withAnimation {
-			for index in offsets {
-				modelContext.delete(items[index])
-			}
 		}
 	}
 
