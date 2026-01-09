@@ -26,13 +26,13 @@ struct ContentView: View {
 
 	let model = ContentModel()
 
-	@State var scrollPosition: PersistentIdentifier?
-
-	@State var text: String = "fdsfdsfd"
-
 	@State var isPresented: Bool = false
 
+	@State var filterEditorIsPresented: Bool = false
+
 	@State var selection: Set<PersistentIdentifier> = []
+
+	@State var selectedTags: Set<UUID> = []
 
 	var body: some View {
 		NavigationStack {
@@ -45,23 +45,10 @@ struct ContentView: View {
 					)
 				} else {
 					List(selection: $selection) {
-						ForEach(items) { item in
-							ItemView(isEditing: editMode == .active, item: item)
-							.contextMenu {
-								Toggle(isOn: item.isOn) {
-									Text("Completed")
-								}
-								Divider()
-								Button(role: .destructive) {
-									deleteItem(item: item)
-								} label: {
-									Label("Delete", systemImage: "trash")
-								}
+						FilteredContentView(tags: selectedTags, editMode: editMode, moveDisabled: !selectedTags.isEmpty)
+							.onMove { indices, target in
+								moveItems(with: indices, to: target)
 							}
-						}
-						.onMove { indices, target in
-							moveItems(with: indices, to: target)
-						}
 					}
 					.listStyle(.insetGrouped)
 				}
@@ -78,6 +65,11 @@ struct ContentView: View {
 					}
 				}
 			}
+			.sheet(isPresented: $filterEditorIsPresented) {
+				FilterEditor(selected: selectedTags) { selected in
+					self.selectedTags = selected
+				}
+			}
 			.toolbar {
 				buildToolbar()
 			}
@@ -92,11 +84,11 @@ extension ContentView {
 	@ToolbarContentBuilder
 	func buildToolbar() -> some ToolbarContent {
 		#if os(iOS)
-		ToolbarItem(placement: .navigationBarTrailing) {
+		ToolbarItem(placement: .topBarTrailing) {
 			EditButton()
 		}
-		if editMode != .active {
-			ToolbarItemGroup(placement: .bottomBar) {
+		ToolbarItem(placement: .topBarTrailing) {
+			Menu {
 				Button {
 					undoManager?.undo()
 				} label: {
@@ -109,8 +101,38 @@ extension ContentView {
 					Label("Redo", systemImage: "arrow.uturn.forward")
 				}
 				.disabled(undoManager?.canRedo == false)
+				Divider()
+				NavigationLink {
+					TagsEditor()
+				} label: {
+					Label("Tags...", systemImage: "tag")
+				}
+			} label: {
+				Label("Common", systemImage: "ellipsis")
+			}
+			.disabled(editMode == .active)
+		}
+		ToolbarItem(placement: .bottomBar) {
+			if selectedTags.isEmpty {
+				Button {
+					self.filterEditorIsPresented = true
+				} label: {
+					Image(systemName: "line.3.horizontal.decrease")
+				}
+				.tint(!selectedTags.isEmpty ? .accentColor : .primary)
+				.disabled(editMode == .active)
+			} else {
+				Button {
+					self.filterEditorIsPresented = true
+				} label: {
+					Image(systemName: "line.3.horizontal.decrease")
+				}
+				.tint(!selectedTags.isEmpty ? .accentColor : .primary)
+				.buttonStyle(GlassProminentButtonStyle())
+				.disabled(editMode == .active)
 			}
 		}
+
 		ToolbarItem(placement: .bottomBar) {
 			Spacer()
 		}

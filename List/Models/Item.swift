@@ -11,6 +11,8 @@ import SwiftData
 @Model
 final class Item {
 
+	@Attribute(.unique) var uuid: UUID
+
 	var timestamp: Date
 
 	var text: String
@@ -19,9 +21,21 @@ final class Item {
 
 	var index: Int
 
+	// MARK: - Relationships
+
+	@Relationship(deleteRule: .nullify, inverse: \Tag.items)
+	var tags: [Tag] = []
+
 	// MARK: - Initialization
 
-	init(timestamp: Date = .now, text: String, rawStatus: UInt8 = Status.incomplete.rawValue, index: Int = 0) {
+	init(
+		uuid: UUID = .init(),
+		timestamp: Date = .now,
+		text: String,
+		rawStatus: UInt8 = Status.incomplete.rawValue,
+		index: Int = 0
+	) {
+		self.uuid = uuid
 		self.timestamp = timestamp
 		self.text = text
 		self.rawStatus = rawStatus

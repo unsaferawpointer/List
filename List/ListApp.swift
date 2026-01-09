@@ -27,6 +27,15 @@ struct ListApp: App {
 						index += 1
 					}
 				}
+				if let text = Loader().loadTextFileFromBundle(filename: "PreviewTags", withExtension: "txt") {
+					var index = 0
+					text.enumerateLines { line, stop in
+						let new = Tag(title: line)
+						new.index = index
+						container.mainContext.insert(new)
+						index += 1
+					}
+				}
 			case .failure:
 				break
 			}

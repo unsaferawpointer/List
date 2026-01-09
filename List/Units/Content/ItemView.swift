@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ItemView: View {
 
-	@State var isEditing: Bool
+	let isEditing: Bool
 
 	var item: Item
 
@@ -20,10 +20,17 @@ struct ItemView: View {
 					.foregroundStyle(item.isCompleted ? .secondary : .primary)
 					.frame(width: 4, height: 4)
 			}
-			Text(item.text)
-				.foregroundStyle(item.isCompleted ? .secondary : .primary)
-				.lineLimit(2)
-				.strikethrough(item.isCompleted)
+			VStack(alignment: .leading) {
+				Text(item.text)
+					.foregroundStyle(item.isCompleted ? .secondary : .primary)
+					.lineLimit(2)
+					.strikethrough(item.isCompleted)
+				if !item.tags.isEmpty {
+					Text(item.tags.map(\.title).joined(separator: " | "))
+						.font(.caption)
+						.foregroundStyle(.secondary)
+				}
+			}
 		}
 	}
 }
