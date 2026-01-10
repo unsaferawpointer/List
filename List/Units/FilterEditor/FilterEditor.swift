@@ -28,28 +28,57 @@ struct FilterEditor: View {
 
 	var body: some View {
 		NavigationStack {
-			List {
-				Section("Include") {
-					ForEach(tags) { tag in
-						Button {
-							if selection.contains(tag.uuid) {
-								selection.remove(tag.uuid)
-							} else {
-								selection.insert(tag.uuid)
+			Group {
+				if tags.isEmpty {
+					ContentUnavailableView {
+						Text("No Tags")
+					} description: {
+						Text("You can create tags from main menu")
+					}
+				} else {
+					List {
+						Section {
+							ForEach(tags) { tag in
+								Button {
+									if selection.contains(tag.uuid) {
+										selection.remove(tag.uuid)
+									} else {
+										selection.insert(tag.uuid)
+									}
+								} label: {
+									HStack {
+										Label(tag.title, systemImage: "tag")
+											.foregroundStyle(.primary)
+										Spacer()
+										if selection.contains(tag.uuid) {
+											Image(systemName: "checkmark")
+										}
+									}
+								}
+								.listItemTint(.primary)
 							}
-						} label: {
-							HStack {
-								Label(tag.title, systemImage: "tag")
-									.foregroundStyle(.primary)
-								Spacer()
-								if selection.contains(tag.uuid) {
-									Image(systemName: "checkmark")
+						} header: {
+							Text("Include tags")
+						} footer: {
+							if selection.isEmpty {
+								Text("No Filter")
+							}
+						}
+
+						Section {
+							Button(role: .destructive) {
+								selection.removeAll()
+							} label: {
+								HStack {
+									Spacer()
+									Text("Clear")
+									Spacer()
 								}
 							}
 						}
-						.listItemTint(.primary)
 					}
 				}
+
 			}
 			.listStyle(.insetGrouped)
 			.navigationTitle("Filter")
