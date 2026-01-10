@@ -24,6 +24,16 @@ struct ContentView: View {
 		animation: .default
 	) private var items: [Item]
 
+	@Query(
+		filter: nil,
+		sort:
+			[
+				SortDescriptor(\Tag.index, order: .forward),
+				SortDescriptor(\Tag.timestamp, order: .forward)
+			],
+		animation: .default
+	) private var tags: [Tag]
+
 	let model = ContentModel()
 
 	@State var isPresented: Bool = false
@@ -53,7 +63,22 @@ struct ContentView: View {
 					.listStyle(.insetGrouped)
 				}
 			}
-			.navigationTitle(model.navigationTitle(isEditMode: editMode == .active, selection: selection))
+			.navigationTitle(
+				model.navigationTitle(
+					isEditMode: editMode == .active,
+					selection: selection,
+					tags: tags,
+					selected: selectedTags
+				)
+			)
+			.navigationSubtitle(
+				model.navigationSubtitle(
+					isEditMode: editMode == .active,
+					selection: selection,
+					tags: tags,
+					selected: selectedTags
+				) ?? ""
+			)
 			.sheet(isPresented: $isPresented) {
 				ItemDetails(title: "New Item", text: "") { newText in
 					withAnimation {
