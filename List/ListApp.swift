@@ -15,27 +15,10 @@ struct ListApp: App {
 		WindowGroup {
 			ContentView()
 		}
-		.modelContainer(for: [Item.self], inMemory: true, isAutosaveEnabled: true, isUndoEnabled: true) { result in
+		.modelContainer(for: [Item.self], inMemory: false, isAutosaveEnabled: true, isUndoEnabled: true) { result in
 			switch result {
 			case let .success(container):
-				if let text = Loader().loadTextFileFromBundle(filename: "PreviewItems", withExtension: "txt") {
-					var index = 0
-					text.enumerateLines { line, stop in
-						let new = Item(text: line)
-						new.index = index
-						container.mainContext.insert(new)
-						index += 1
-					}
-				}
-				if let text = Loader().loadTextFileFromBundle(filename: "PreviewTags", withExtension: "txt") {
-					var index = 0
-					text.enumerateLines { line, stop in
-						let new = Tag(title: line)
-						new.index = index
-						container.mainContext.insert(new)
-						index += 1
-					}
-				}
+				break
 			case .failure:
 				break
 			}
