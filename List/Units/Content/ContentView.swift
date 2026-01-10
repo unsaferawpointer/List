@@ -38,8 +38,6 @@ struct ContentView: View {
 
 	@State var isPresented: Bool = false
 
-	@State var filterEditorIsPresented: Bool = false
-
 	@State var selection: Set<PersistentIdentifier> = []
 
 	@State var selectedTags: Set<UUID> = []
@@ -55,12 +53,47 @@ struct ContentView: View {
 					)
 				} else {
 					List(selection: $selection) {
-						FilteredContentView(tags: selectedTags, editMode: editMode, moveDisabled: !selectedTags.isEmpty)
-							.onMove { indices, target in
-								moveItems(with: indices, to: target)
+						ScrollView(.horizontal) {
+							HStack {
+								ForEach(tags) { tag in
+									Button {
+										withAnimation {
+											if selectedTags.contains(tag.uuid) {
+												selectedTags.remove(tag.uuid)
+											} else {
+												selectedTags.insert(tag.uuid)
+											}
+										}
+									} label: {
+										Text(tag.title)
+											.font(.callout)
+											.fontWeight(.semibold)
+											.padding(.horizontal)
+											.padding([.top, .bottom], 6)
+											.background {
+												Capsule(style: .continuous)
+													.fill(
+														!selectedTags.contains(tag.uuid)
+															? Color(uiColor: .quaternarySystemFill)
+															: Color(uiColor: .tintColor).opacity(0.1)
+													)
+											}
+									}
+									.buttonStyle(.plain)
+
+								}
 							}
+						}
+						.scrollIndicators(.hidden)
+						.listRowSeparator(.hidden)
+						Section {
+							FilteredContentView(tags: selectedTags, editMode: editMode, moveDisabled: !selectedTags.isEmpty)
+								.onMove { indices, target in
+									moveItems(with: indices, to: target)
+								}
+						}
 					}
-					.listStyle(.insetGrouped)
+					.listStyle(.inset)
 				}
 			}
 			.navigationTitle(
@@ -77,7 +110,7 @@ struct ContentView: View {
 					selection: selection,
 					tags: tags,
 					selected: selectedTags
-				) ?? ""
+				) ?? "\(items.count) Items"
 			)
 			.sheet(isPresented: $isPresented) {
 				ItemDetails(title: "New Item", text: "") { newText in
@@ -88,11 +121,6 @@ struct ContentView: View {
 						}
 						modelContext.insert(newItem)
 					}
-				}
-			}
-			.sheet(isPresented: $filterEditorIsPresented) {
-				FilterEditor(selected: selectedTags) { selected in
-					self.selectedTags = selected
 				}
 			}
 			.toolbar {
@@ -137,27 +165,6 @@ extension ContentView {
 			}
 			.disabled(editMode == .active)
 		}
-		ToolbarItem(placement: .bottomBar) {
-			if selectedTags.isEmpty {
-				Button {
-					self.filterEditorIsPresented = true
-				} label: {
-					Image(systemName: "line.3.horizontal.decrease")
-				}
-				.tint(!selectedTags.isEmpty ? .accentColor : .primary)
-				.disabled(editMode == .active)
-			} else {
-				Button {
-					self.filterEditorIsPresented = true
-				} label: {
-					Image(systemName: "line.3.horizontal.decrease")
-				}
-				.tint(!selectedTags.isEmpty ? .accentColor : .primary)
-				.buttonStyle(GlassProminentButtonStyle())
-				.disabled(editMode == .active)
-			}
-		}
-
 		ToolbarItem(placement: .bottomBar) {
 			Spacer()
 		}
