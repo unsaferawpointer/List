@@ -36,7 +36,11 @@ struct ContentView: View {
 
 	let model = ContentModel()
 
-	@State var isPresented: Bool = false
+	@State var isItemEditorPresented: Bool = false
+
+	@State var presentedItem: Item?
+
+	@State var presentedItemForTagsPicker: Item?
 
 	@State var selection: Set<PersistentIdentifier> = []
 
@@ -57,10 +61,31 @@ struct ContentView: View {
 							TagsSection(tags: tags, selectedTags: $selectedTags)
 						}
 						Section {
-							FilteredContentView(tags: selectedTags, editMode: editMode, moveDisabled: !selectedTags.isEmpty)
-								.onMove { indices, target in
-									moveItems(with: indices, to: target)
+							FilteredContentView(tags: selectedTags, editMode: editMode, moveDisabled: !selectedTags.isEmpty) { item in
+								Button {
+									self.presentedItem = item
+								} label: {
+									Text("Edit...")
 								}
+								Divider()
+								Toggle(isOn: item.isOn) {
+									Text("Completed")
+								}
+								Button {
+									self.presentedItemForTagsPicker = item
+								} label: {
+									Label("Tags...", systemImage: "tag")
+								}
+								Divider()
+								Button(role: .destructive) {
+									//					deleteItem(item: item)
+								} label: {
+									Label("Delete", systemImage: "trash")
+								}
+							}
+							.onMove { indices, target in
+								moveItems(with: indices, to: target)
+							}
 						}
 					}
 					.listStyle(.inset)
@@ -82,7 +107,7 @@ struct ContentView: View {
 					selected: selectedTags
 				) ?? "\(items.count) Items"
 			)
-			.sheet(isPresented: $isPresented) {
+			.sheet(isPresented: $isItemEditorPresented) {
 				ItemDetails(title: "New Item", text: "") { newText in
 					withAnimation {
 						let newItem = Item(timestamp: Date(), text: newText)
@@ -91,6 +116,21 @@ struct ContentView: View {
 						}
 						modelContext.insert(newItem)
 					}
+				}
+			}
+			.sheet(item: $presentedItem) { item in
+				ItemDetails(title: "Edit Item", text: item.text) { newText in
+					withAnimation {
+						item.text = newText
+					}
+				}
+			}
+			.sheet(item: $presentedItemForTagsPicker) { item in
+				TagsPicker(selected: Set(item.tags.map(\.id))) { selected in
+					let filtered = tags.filter { item in
+						selected.contains(item.id)
+					}
+					item.tags = filtered
 				}
 			}
 			.toolbar {
@@ -194,7 +234,7 @@ private extension ContentView {
 
 	func addItem() {
 		withAnimation {
-			self.isPresented = true
+			self.isItemEditorPresented = true
 		}
 	}
 

@@ -8,13 +8,15 @@
 import SwiftUI
 import SwiftData
 
-struct FilteredContentView {
+struct FilteredContentView<V: View> {
 
 	@Environment(\.modelContext) private var modelContext
 
 	let editMode: EditMode
 
 	let moveDisabled: Bool
+
+	let menuBuilder: (Item) -> V
 
 	@Query(
 		filter: nil,
@@ -50,7 +52,7 @@ struct FilteredContentView {
 
 	// MARK: - Initialization
 
-	init(tags: Set<UUID>, editMode: EditMode, moveDisabled: Bool) {
+	init(tags: Set<UUID>, editMode: EditMode, moveDisabled: Bool, @ViewBuilder menuBuilder: @escaping (Item) -> V) {
 
 		let predicate = #Predicate<Item> { item in
 			item.tags.filter { tag in
@@ -69,6 +71,7 @@ struct FilteredContentView {
 		)
 		self.editMode = editMode
 		self.moveDisabled = moveDisabled
+		self.menuBuilder = menuBuilder
 	}
 }
 
@@ -86,39 +89,14 @@ extension FilteredContentView: View, DynamicViewContent {
 			ItemView(isEditing: editMode == .active, item: item)
 				.moveDisabled(moveDisabled)
 				.contextMenu {
-					Button {
-
-					} label: {
-						Text("Edit...")
-					}
-					Divider()
-					Toggle(isOn: item.isOn) {
-						Text("Completed")
-					}
-					Button {
-						self.presentedItem = item
-					} label: {
-						Label("Tags...", systemImage: "tag")
-					}
-					Divider()
-					Button(role: .destructive) {
-						//					deleteItem(item: item)
-					} label: {
-						Label("Delete", systemImage: "trash")
-					}
+					menuBuilder(item)
 				}
-		}
-		.sheet(item: $presentedItem) { item in
-			TagsPicker(selected: Set(item.tags.map(\.id))) { selected in
-				let filtered = tags.filter { item in
-					selected.contains(item.id)
-				}
-				item.tags = filtered
-			}
 		}
 	}
 }
 
 #Preview {
-	FilteredContentView(tags: [], editMode: .inactive, moveDisabled: false)
+	FilteredContentView(tags: [], editMode: .inactive, moveDisabled: false) { item in
+		EmptyView()
+	}
 }
