@@ -78,7 +78,7 @@ struct ContentView: View {
 								}
 								Divider()
 								Button(role: .destructive) {
-									//					deleteItem(item: item)
+									deleteItem(item: item)
 								} label: {
 									Label("Delete", systemImage: "trash")
 								}
