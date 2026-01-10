@@ -34,11 +34,13 @@ extension TagsEditor.Model {
 	}
 
 	func deleteTags(selected: Set<PersistentIdentifier>, in modelContext: ModelContext) {
-		for id in selected {
-			guard let tag = modelContext.model(for: id) as? Tag else {
-				continue
+		try? modelContext.transaction {
+			for id in selected {
+				guard let tag = modelContext.model(for: id) as? Tag else {
+					continue
+				}
+				modelContext.delete(tag)
 			}
-			modelContext.delete(tag)
 		}
 	}
 }

@@ -54,7 +54,7 @@ struct TagsEditor: View {
 				.contextMenu(forSelectionType: PersistentIdentifier.self) { selected in
 					buildMenu(for: selected)
 				}
-				.listStyle(.inset)
+				.listStyle(.insetGrouped)
 			}
 		}
 		.sheet(isPresented: $isPresented) {
@@ -77,8 +77,17 @@ struct TagsEditor: View {
 				Spacer()
 			}
 			ToolbarItem(placement: .bottomBar) {
-				Button(action: addTag) {
-					Label("Add Item", systemImage: "plus")
+				if editMode == .active {
+					Button(role: .destructive) {
+						deleteTags(selected: selection)
+					} label: {
+						Label("Delete", systemImage: "trash")
+					}
+					.disabled(selection.isEmpty)
+				} else {
+					Button(action: addTag) {
+						Label("Add Item", systemImage: "plus")
+					}
 				}
 			}
 		}
