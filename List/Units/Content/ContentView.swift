@@ -54,39 +54,7 @@ struct ContentView: View {
 				} else {
 					List(selection: $selection) {
 						if !tags.isEmpty {
-							ScrollView(.horizontal) {
-								HStack {
-									ForEach(tags) { tag in
-										Button {
-											withAnimation {
-												if selectedTags.contains(tag.uuid) {
-													selectedTags.remove(tag.uuid)
-												} else {
-													selectedTags.insert(tag.uuid)
-												}
-											}
-										} label: {
-											Text(tag.title)
-												.font(.callout)
-												.fontWeight(.semibold)
-												.padding(.horizontal)
-												.padding([.top, .bottom], 6)
-												.background {
-													Capsule(style: .continuous)
-														.fill(
-															!selectedTags.contains(tag.uuid)
-																? Color(uiColor: .quaternarySystemFill)
-																: Color(uiColor: .tintColor).opacity(0.1)
-														)
-												}
-										}
-										.buttonStyle(.plain)
-
-									}
-								}
-							}
-							.scrollIndicators(.hidden)
-							.listRowSeparator(.hidden)
+							TagsSection(tags: tags, selectedTags: $selectedTags)
 						}
 						Section {
 							FilteredContentView(tags: selectedTags, editMode: editMode, moveDisabled: !selectedTags.isEmpty)
