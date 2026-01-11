@@ -1,0 +1,45 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%lld Selected" : {
+
+    },
+    "All Items" : {
+
+    },
+    "Completed" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Edit Item" : {
+
+    },
+    "Edit..." : {
+
+    },
+    "Filtered by tags" : {
+
+    },
+    "New Item" : {
+
+    },
+    "No Tasks" : {
+
+    },
+    "Redo" : {
+
+    },
+    "Tags..." : {
+
+    },
+    "Tap \"+\" to add your first task." : {
+
+    },
+    "Undo" : {
+
+    }
+  },
+  "version" : "1.1"
+}

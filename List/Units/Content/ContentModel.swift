@@ -12,7 +12,42 @@ final class ContentModel {
 
 }
 
+// MARK: - Context Menu Localization
 extension ContentModel {
+
+	func menuItemTitle(id: ElementIdentifier) -> String {
+		switch id {
+		case .edit:
+			String(localized: "Edit...", table: "ContentLocalizable")
+		case .delete:
+			String(localized: "Delete", table: "ContentLocalizable")
+		case .undo:
+			String(localized: "Undo", table: "ContentLocalizable")
+		case .redo:
+			String(localized: "Redo", table: "ContentLocalizable")
+		case .tags:
+			String(localized: "Tags...", table: "ContentLocalizable")
+		case .status:
+			String(localized: "Completed", table: "ContentLocalizable")
+		}
+	}
+}
+
+extension ContentModel {
+
+	func itemEditorTitle(isNew: Bool) -> String {
+		isNew
+			? String(localized: "New Item", table: "ContentLocalizable")
+			: String(localized: "Edit Item", table: "ContentLocalizable")
+	}
+
+	func contentUnavailableMessage() -> String {
+		String(localized: "Tap \"+\" to add your first task.", table: "ContentLocalizable")
+	}
+
+	func contentUnavailableTitle() -> String {
+		String(localized: "No Tasks", table: "ContentLocalizable")
+	}
 
 	func navigationTitle(
 		isEditMode: Bool,
@@ -44,6 +79,18 @@ extension ContentModel {
 		}
 		.map(\.title)
 		.joined(separator: ", ")
+	}
+}
+
+// MARK: - Public Interface
+extension ContentModel {
+
+	func addItem(text: String, to modelContext: ModelContext, allItems: [Item]) {
+		let newItem = Item(timestamp: Date(), text: text)
+		for item in allItems {
+			item.index += 1
+		}
+		modelContext.insert(newItem)
 	}
 }
 

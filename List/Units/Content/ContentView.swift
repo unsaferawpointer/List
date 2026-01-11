@@ -51,9 +51,9 @@ struct ContentView: View {
 			Group {
 				if model.shouldContentUnavailableView(for: items) {
 					ContentUnavailableView(
-						"No Items",
+						model.contentUnavailableTitle(),
 						systemImage: "shippingbox",
-						description: Text("Add New Item")
+						description: Text(model.contentUnavailableMessage())
 					)
 				} else {
 					List(selection: $selection) {
@@ -62,25 +62,25 @@ struct ContentView: View {
 						}
 						Section {
 							FilteredContentView(tags: selectedTags, editMode: editMode, moveDisabled: !selectedTags.isEmpty) { item in
+								Toggle(isOn: item.isOn) {
+									Text(model.menuItemTitle(id: .status))
+								}
+								Divider()
 								Button {
 									self.presentedItem = item
 								} label: {
-									Text("Edit...")
-								}
-								Divider()
-								Toggle(isOn: item.isOn) {
-									Text("Completed")
+									Label(model.menuItemTitle(id: .edit), systemImage: "pencil")
 								}
 								Button {
 									self.presentedItemForTagsPicker = item
 								} label: {
-									Label("Tags...", systemImage: "tag")
+									Label(model.menuItemTitle(id: .tags), systemImage: "tag")
 								}
 								Divider()
 								Button(role: .destructive) {
 									deleteItem(item: item)
 								} label: {
-									Label("Delete", systemImage: "trash")
+									Label(model.menuItemTitle(id: .delete), systemImage: "trash")
 								}
 							}
 							.onMove { indices, target in
@@ -108,21 +108,13 @@ struct ContentView: View {
 				) ?? "\(items.count) Items"
 			)
 			.sheet(isPresented: $isItemEditorPresented) {
-				ItemDetails(title: "New Item", text: "") { newText in
-					withAnimation {
-						let newItem = Item(timestamp: Date(), text: newText)
-						for item in items {
-							item.index += 1
-						}
-						modelContext.insert(newItem)
-					}
+				ItemDetails(title: model.itemEditorTitle(isNew: false), text: "") { newText in
+					addItem(with: newText)
 				}
 			}
 			.sheet(item: $presentedItem) { item in
-				ItemDetails(title: "Edit Item", text: item.text) { newText in
-					withAnimation {
-						item.text = newText
-					}
+				ItemDetails(title: model.itemEditorTitle(isNew: false), text: item.text) { newText in
+					updateItem(item, newText: newText)
 				}
 			}
 			.sheet(item: $presentedItemForTagsPicker) { item in
@@ -199,7 +191,7 @@ extension ContentView {
 				.disabled(selection.isEmpty)
 			} else {
 				Button {
-					addItem()
+					showItemEditor()
 				} label: {
 					Label("Add Item", systemImage: "plus")
 				}
@@ -232,7 +224,19 @@ private extension ContentView {
 		}
 	}
 
-	func addItem() {
+	func addItem(with text: String) {
+		withAnimation {
+			model.addItem(text: text, to: modelContext, allItems: items)
+		}
+	}
+
+	func updateItem(_ item: Item, newText: String) {
+		withAnimation {
+			item.text = newText
+		}
+	}
+
+	func showItemEditor() {
 		withAnimation {
 			self.isItemEditorPresented = true
 		}
