@@ -34,19 +34,22 @@ struct TagsSection: View {
 							}
 						}
 					} label: {
-						Text(tag.title)
-							.font(.callout)
-							.fontWeight(.semibold)
-							.padding(.horizontal, 12)
-							.padding(.vertical, 6)
-							.background {
-								Capsule(style: .continuous)
-									.fill(
-										!selectedTags.contains(tag.uuid)
-											? Color(uiColor: .quaternarySystemFill)
-											: Color(uiColor: .tintColor).opacity(0.4)
-									)
-							}
+						HStack {
+							Image(systemName: "tag")
+							Text(tag.title)
+								.font(.callout)
+								.fontWeight(.semibold)
+						}
+						.padding(.horizontal, 12)
+						.padding(.vertical, 6)
+						.background {
+							Capsule(style: .continuous)
+								.fill(
+									!selectedTags.contains(tag.uuid)
+										? Color(uiColor: .quaternarySystemFill)
+										: Color(uiColor: .tintColor).opacity(0.4)
+								)
+						}
 					}
 					.buttonStyle(.plain)
 					.scrollTargetLayout()
