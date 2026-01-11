@@ -8,8 +8,18 @@
 import Foundation
 import SwiftData
 
+@Observable
 final class ContentModel {
 
+	var isItemEditorPresented: Bool = false
+
+	var presentedItem: Item?
+
+	var presentedItemForTagsPicker: Item?
+
+	var selection: Set<PersistentIdentifier> = []
+
+	var selectedTags: Set<UUID> = []
 }
 
 // MARK: - Context Menu Localization
@@ -49,13 +59,8 @@ extension ContentModel {
 		String(localized: "No Tasks", table: "ContentLocalizable")
 	}
 
-	func navigationTitle(
-		isEditMode: Bool,
-		selection: Set<PersistentIdentifier>,
-		tags: [Tag],
-		selected: Set<UUID>
-	) -> String {
-		let isFiltering = !tags.isEmpty && !selected.isEmpty
+	func navigationTitle(isEditMode: Bool, tags: [Tag]) -> String {
+		let isFiltering = !tags.isEmpty && !selectedTags.isEmpty
 		guard !isFiltering else {
 			return String(localized: "Filtered by tags", table: "ContentLocalizable")
 		}
@@ -64,18 +69,13 @@ extension ContentModel {
 			: String(localized: "All Items", table: "ContentLocalizable")
 	}
 
-	func navigationSubtitle(
-		isEditMode: Bool,
-		selection: Set<PersistentIdentifier>,
-		tags: [Tag],
-		selected: Set<UUID>
-	) -> String? {
-		let isFiltering = !tags.isEmpty && !selected.isEmpty
+	func navigationSubtitle(isEditMode: Bool, tags: [Tag], items: [Item]) -> String {
+		let isFiltering = !tags.isEmpty && !selectedTags.isEmpty
 		guard isFiltering else {
-			return nil
+			return "\(items.count) Items"
 		}
 		return tags.filter {
-			selected.contains($0.uuid)
+			selectedTags.contains($0.uuid)
 		}
 		.map(\.title)
 		.joined(separator: ", ")

@@ -34,17 +34,7 @@ struct ContentView: View {
 		animation: .default
 	) private var tags: [Tag]
 
-	let model = ContentModel()
-
-	@State var isItemEditorPresented: Bool = false
-
-	@State var presentedItem: Item?
-
-	@State var presentedItemForTagsPicker: Item?
-
-	@State var selection: Set<PersistentIdentifier> = []
-
-	@State var selectedTags: Set<UUID> = []
+	@State var model = ContentModel()
 
 	var body: some View {
 		NavigationStack {
@@ -56,23 +46,23 @@ struct ContentView: View {
 						description: Text(model.contentUnavailableMessage())
 					)
 				} else {
-					List(selection: $selection) {
+					List(selection: $model.selection) {
 						if !tags.isEmpty {
-							TagsSection(tags: tags, selectedTags: $selectedTags)
+							TagsSection(tags: tags, selectedTags: $model.selectedTags)
 						}
 						Section {
-							FilteredContentView(tags: selectedTags, editMode: editMode, moveDisabled: !selectedTags.isEmpty) { item in
+							FilteredContentView(tags: model.selectedTags, editMode: editMode, moveDisabled: !model.selectedTags.isEmpty) { item in
 								Toggle(isOn: item.isOn) {
 									Text(model.menuItemTitle(id: .status))
 								}
 								Divider()
 								Button {
-									self.presentedItem = item
+									self.model.presentedItem = item
 								} label: {
 									Label(model.menuItemTitle(id: .edit), systemImage: "pencil")
 								}
 								Button {
-									self.presentedItemForTagsPicker = item
+									self.model.presentedItemForTagsPicker = item
 								} label: {
 									Label(model.menuItemTitle(id: .tags), systemImage: "tag")
 								}
@@ -92,32 +82,22 @@ struct ContentView: View {
 				}
 			}
 			.navigationTitle(
-				model.navigationTitle(
-					isEditMode: editMode == .active,
-					selection: selection,
-					tags: tags,
-					selected: selectedTags
-				)
+				model.navigationTitle(isEditMode: editMode == .active, tags: tags)
 			)
 			.navigationSubtitle(
-				model.navigationSubtitle(
-					isEditMode: editMode == .active,
-					selection: selection,
-					tags: tags,
-					selected: selectedTags
-				) ?? "\(items.count) Items"
+				model.navigationSubtitle(isEditMode: editMode == .active, tags: tags, items: items)
 			)
-			.sheet(isPresented: $isItemEditorPresented) {
+			.sheet(isPresented: $model.isItemEditorPresented) {
 				ItemDetails(title: model.itemEditorTitle(isNew: false), text: "") { newText in
 					addItem(with: newText)
 				}
 			}
-			.sheet(item: $presentedItem) { item in
+			.sheet(item: $model.presentedItem) { item in
 				ItemDetails(title: model.itemEditorTitle(isNew: false), text: item.text) { newText in
 					updateItem(item, newText: newText)
 				}
 			}
-			.sheet(item: $presentedItemForTagsPicker) { item in
+			.sheet(item: $model.presentedItemForTagsPicker) { item in
 				TagsPicker(selected: Set(item.tags.map(\.id))) { selected in
 					let filtered = tags.filter { item in
 						selected.contains(item.id)
@@ -174,7 +154,7 @@ extension ContentView {
 			if editMode == .active {
 				Menu {
 					Toggle(
-						sources: completionSources(for: selection, in: items),
+						sources: completionSources(for: model.selection, in: items),
 						isOn: \.self
 					) {
 						Text("Completed")
@@ -188,7 +168,7 @@ extension ContentView {
 				} label: {
 					Label("Edit...", systemImage: "ellipsis")
 				}
-				.disabled(selection.isEmpty)
+				.disabled(model.selection.isEmpty)
 			} else {
 				Button {
 					showItemEditor()
@@ -212,10 +192,8 @@ private extension ContentView {
 				item.isCompleted
 			} set: { newValue in
 				item.isCompleted = newValue
-				// После изменения состояния - снимаем выделение
-				selection.remove(item.id)
-				// Если выделение пустое - выходим из режима редактирования
-				if selection.isEmpty {
+				model.selection.remove(item.id)
+				if model.selection.isEmpty {
 					withAnimation {
 						editMode = .inactive
 					}
@@ -238,16 +216,16 @@ private extension ContentView {
 
 	func showItemEditor() {
 		withAnimation {
-			self.isItemEditorPresented = true
+			self.model.isItemEditorPresented = true
 		}
 	}
 
 	func deleteSelectedItems() {
 		withAnimation {
 			let filtered = items.filter {
-				selection.contains($0.id)
+				model.selection.contains($0.id)
 			}
-			selection.removeAll()
+			model.selection.removeAll()
 			for item in filtered {
 				modelContext.delete(item)
 			}
