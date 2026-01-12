@@ -69,6 +69,7 @@ struct TagsEditor: View {
 				tag.title = newModel.name
 			}
 		}
+		.navigationTitle("All Tags")
 		.toolbar {
 			ToolbarItem(placement: .primaryAction) {
 				EditButton()
