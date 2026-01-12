@@ -51,6 +51,7 @@ extension TagsPicker: View {
 						.contentShape(Rectangle())
 					}
 					.buttonStyle(.plain)
+					.listItemTint(.primary)
 				}
 			}
 			.listStyle(.insetGrouped)

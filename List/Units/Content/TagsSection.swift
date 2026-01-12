@@ -55,7 +55,7 @@ struct TagsSection: View {
 					.scrollTargetLayout()
 				}
 			}
-			.padding(.vertical, 4)
+			.padding(.vertical, 6)
 		}
 		.scrollIndicators(.hidden)
 		.scrollTargetBehavior(.viewAligned)
