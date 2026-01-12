@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct TagsPicker: View {
+struct TagsPicker {
 
 	@Environment(\.dismiss) var dismiss
 
@@ -25,6 +25,10 @@ struct TagsPicker: View {
 		self._selection = State(initialValue: selected)
 		self.completion = completion
 	}
+}
+
+// MARK: - View
+extension TagsPicker: View {
 
 	var body: some View {
 		NavigationStack {
@@ -44,11 +48,14 @@ struct TagsPicker: View {
 								Image(systemName: "checkmark")
 							}
 						}
-						.listItemTint(.primary)
+						.contentShape(Rectangle())
 					}
+					.buttonStyle(.plain)
 				}
 			}
 			.listStyle(.insetGrouped)
+			.navigationTitle("Select tags")
+			.navigationSubtitle("\(selection.count) selected")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .close) {
