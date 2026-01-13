@@ -98,11 +98,19 @@ struct ContentView: View {
 				}
 			}
 			.sheet(item: $model.presentedItemForTagsPicker) { item in
-				TagsPicker(selected: Set(item.tags.map(\.id))) { selected in
+				TagsPicker(items: Set([item.id])) { selected in
 					let filtered = tags.filter { item in
 						selected.contains(item.id)
 					}
 					item.tags = filtered
+				}
+			}
+			.sheet(isPresented: $model.isTagPickerPresented) {
+				TagsPicker(items: model.selection) { selected in
+					let filtered = tags.filter { item in
+						selected.contains(item.id)
+					}
+//					item.tags = filtered
 				}
 			}
 			.toolbar {
@@ -158,6 +166,12 @@ extension ContentView {
 						isOn: \.self
 					) {
 						Text("Completed")
+					}
+					Divider()
+					Button {
+						self.model.isTagPickerPresented = true
+					} label: {
+						Label("Tags...", systemImage: "tag")
 					}
 					Divider()
 					Button(role: .destructive) {

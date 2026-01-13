@@ -38,7 +38,7 @@ struct TagsSection: View {
 							Image(systemName: "tag")
 							Text(tag.title)
 								.font(.callout)
-								.fontWeight(.semibold)
+								.fontWeight(.regular)
 						}
 						.padding(.horizontal, 12)
 						.padding(.vertical, 6)

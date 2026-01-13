@@ -17,6 +17,8 @@ final class ContentModel {
 
 	var presentedItemForTagsPicker: Item?
 
+	var isTagPickerPresented: Bool = false
+
 	var selection: Set<PersistentIdentifier> = []
 
 	var selectedTags: Set<UUID> = []

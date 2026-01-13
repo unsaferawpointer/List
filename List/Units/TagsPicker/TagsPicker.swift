@@ -13,17 +13,47 @@ struct TagsPicker {
 	@Environment(\.dismiss) var dismiss
 
 	@Environment(\.modelContext) private var modelContext
-	@Query private var tags: [Tag]
 
-	@State var selection: Set<PersistentIdentifier>
+	@Query private var tags: [Tag]
+	@Query private var items: [Item]
 
 	let completion: (Set<PersistentIdentifier>) -> Void
 
+	@State var changes: [PersistentIdentifier: Bool] = [:]
+
 	// MARK: - Initialization
 
-	init(selected: Set<PersistentIdentifier>, completion: @escaping (Set<PersistentIdentifier>) -> Void) {
-		self._selection = State(initialValue: selected)
+	init(items: Set<PersistentIdentifier>, completion: @escaping (Set<PersistentIdentifier>) -> Void) {
+		let predicate = #Predicate<Item> { item in
+			items.contains(item.id)
+		}
+		self._items = Query(filter: predicate, animation: .default)
 		self.completion = completion
+	}
+}
+
+// MARK: - Helpers
+extension TagsPicker {
+
+	func sources(for tag: PersistentIdentifier) -> ControlState {
+		if let value = changes[tag] {
+			return value ? .on : .off
+		}
+		let allChecked = items.allSatisfy { $0.tags.contains(where: { $0.id == tag })}
+		let allUnchecked = items.allSatisfy { !$0.tags.contains(where: { $0.id == tag })}
+		if allChecked {
+			return .on
+		} else if allUnchecked {
+			return .off
+		} else {
+			return .mixed
+		}
+	}
+
+	enum ControlState {
+		case off
+		case mixed
+		case on
 	}
 }
 
@@ -32,19 +62,26 @@ extension TagsPicker: View {
 
 	var body: some View {
 		NavigationStack {
-			List {
+			Form {
 				ForEach(tags, id: \.id) { tag in
 					Button {
-						if selection.contains(tag.id) {
-							selection.remove(tag.id)
-						} else {
-							selection.insert(tag.id)
+						let state = sources(for: tag.id)
+						switch state {
+						case .off, .mixed:
+							changes[tag.id] = true
+						case .on:
+							changes[tag.id] = false
 						}
 					} label: {
 						HStack {
 							Label(tag.title, systemImage: "tag")
 							Spacer()
-							if selection.contains(tag.id) {
+							switch sources(for: tag.id) {
+							case .off:
+								EmptyView()
+							case .mixed:
+								Image(systemName: "minus")
+							case .on:
 								Image(systemName: "checkmark")
 							}
 						}
@@ -56,7 +93,6 @@ extension TagsPicker: View {
 			}
 			.listStyle(.insetGrouped)
 			.navigationTitle("Select tags")
-			.navigationSubtitle("\(selection.count) selected")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .close) {
@@ -68,8 +104,16 @@ extension TagsPicker: View {
 				}
 				ToolbarItem(placement: .confirmationAction) {
 					Button(role: .confirm) {
-						completion(selection)
 						dismiss()
+						for (key, value) in changes {
+							for item in items {
+								if value, let tag = tags.first(where: { $0.id == key }) {
+									item.tags.append(tag)
+								} else {
+									item.tags.removeAll(where: { $0.id == key })
+								}
+							}
+						}
 					}
 				}
 			}
@@ -78,6 +122,7 @@ extension TagsPicker: View {
 }
 
 #Preview {
-	TagsPicker(selected: []) { _ in }
+	TagsPicker(items: []) { _ in }
 		.modelContainer(for: Tag.self, inMemory: true)
+		.modelContainer(for: Item.self, inMemory: true)
 }
