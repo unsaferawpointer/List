@@ -88,7 +88,7 @@ struct ContentView: View {
 				model.navigationSubtitle(isEditMode: editMode == .active, tags: tags, items: items)
 			)
 			.sheet(isPresented: $model.isItemEditorPresented) {
-				ItemDetails(title: model.itemEditorTitle(isNew: false), text: "") { newText in
+				ItemDetails(title: model.itemEditorTitle(isNew: true), text: "") { newText in
 					addItem(with: newText)
 				}
 			}

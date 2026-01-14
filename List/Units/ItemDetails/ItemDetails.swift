@@ -11,31 +11,35 @@ struct ItemDetails: View {
 
 	@Environment(\.dismiss) var dismiss
 
-	@State var text: String = ""
+	@State var title: String
 
 	@FocusState var isFocused: Bool
 
-	@State var title: String
-
-	var completion: ((String) -> Void)?
+	@State var model: Model
 
 	// MARK: - Initialization
 
 	init(title: String, text: String, completion: ((String) -> Void)?) {
-		self._text = State(initialValue: text)
-		self._title = State(initialValue: title)
-		self.completion = completion
+		self._title = .init(initialValue: title)
+		self.model = Model(initialText: text, completion: completion)
 	}
 
 	var body: some View {
 		NavigationStack {
 			Form {
-				TextField("Required", text: $text, axis: .vertical)
-					.lineLimit(2)
-					.focused($isFocused)
-					.onAppear {
-						self.isFocused = true
+				Section {
+					TextField(model.textfieldHint, text: $model.text, axis: .vertical)
+						.lineLimit(2)
+						.focused($isFocused)
+						.onAppear {
+							self.isFocused = true
+						}
+				} footer: {
+					if let errorMessage = model.textfieldErrorMessage {
+						Text(errorMessage)
+							.foregroundColor(.red)
 					}
+				}
 			}
 			.navigationTitle(title)
 			.navigationBarTitleDisplayMode(.inline)
@@ -47,9 +51,10 @@ struct ItemDetails: View {
 				}
 				ToolbarItem(placement: .confirmationAction) {
 					Button(role: .confirm) {
-						completion?(text)
 						dismiss()
+						model.confirm()
 					}
+					.disabled(!model.isValid)
 				}
 			}
 		}

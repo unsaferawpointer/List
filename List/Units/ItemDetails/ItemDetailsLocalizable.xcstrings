@@ -1,0 +1,9 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Required" : {
+      "comment" : "Textfield hint"
+    }
+  },
+  "version" : "1.1"
+}
