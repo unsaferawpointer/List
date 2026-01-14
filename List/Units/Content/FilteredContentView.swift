@@ -54,11 +54,17 @@ struct FilteredContentView<V: View> {
 
 	init(tags: Set<UUID>, editMode: EditMode, moveDisabled: Bool, @ViewBuilder menuBuilder: @escaping (Item) -> V) {
 
-		let predicate = #Predicate<Item> { item in
-			item.tags.filter { tag in
-				tags.contains(tag.uuid)
-			}.count == tags.count
-		}
+		let predicate = {
+			if tags.isEmpty {
+				return #Predicate<Item> { _ in true }
+			} else {
+				return #Predicate<Item> { item in
+					item.tags?.contains { tag in
+						tags.contains(tag.uuid)
+					} == true
+				}
+			}
+		}()
 
 		self._filteredItems = Query(
 			filter: predicate,

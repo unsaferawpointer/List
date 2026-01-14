@@ -39,8 +39,8 @@ extension TagsPicker {
 		if let value = changes[tag] {
 			return value ? .on : .off
 		}
-		let allChecked = items.allSatisfy { $0.tags.contains(where: { $0.id == tag })}
-		let allUnchecked = items.allSatisfy { !$0.tags.contains(where: { $0.id == tag })}
+		let allChecked = items.allSatisfy { $0.tags?.contains(where: { $0.id == tag }) == true }
+		let allUnchecked = items.allSatisfy { !($0.tags?.contains(where: { $0.id == tag }) == false)}
 		if allChecked {
 			return .on
 		} else if allUnchecked {
@@ -108,9 +108,9 @@ extension TagsPicker: View {
 						for (key, value) in changes {
 							for item in items {
 								if value, let tag = tags.first(where: { $0.id == key }) {
-									item.tags.append(tag)
+									item.tags?.append(tag)
 								} else {
-									item.tags.removeAll(where: { $0.id == key })
+									item.tags?.removeAll(where: { $0.id == key })
 								}
 							}
 						}

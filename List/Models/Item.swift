@@ -11,20 +11,20 @@ import SwiftData
 @Model
 final class Item {
 
-	@Attribute(.unique) var uuid: UUID
+	var uuid: UUID = UUID()
 
-	var timestamp: Date
+	var timestamp: Date = Date(timeIntervalSince1970: 0)
 
-	var text: String
+	var text: String = ""
 
-	var rawStatus: UInt8
+	var rawStatus: UInt8 = 0
 
-	var index: Int
+	var index: Int = 0
 
 	// MARK: - Relationships
 
 	@Relationship(deleteRule: .nullify, inverse: \Tag.items)
-	var tags: [Tag] = []
+	var tags: [Tag]? = []
 
 	// MARK: - Initialization
 

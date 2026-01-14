@@ -25,8 +25,8 @@ struct ItemView: View {
 					.foregroundStyle(item.isCompleted ? .secondary : .primary)
 					.lineLimit(2)
 					.strikethrough(item.isCompleted)
-				if !item.tags.isEmpty {
-					Text(item.tags.map(\.title).joined(separator: " | "))
+				if !(item.tags?.isEmpty == true) {
+					Text(item.tags?.map(\.title).joined(separator: " | ") ?? "")
 						.font(.caption)
 						.foregroundStyle(.secondary)
 				}
