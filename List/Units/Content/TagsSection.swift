@@ -52,9 +52,9 @@ struct TagsSection: View {
 						}
 					}
 					.buttonStyle(.plain)
-					.scrollTargetLayout()
 				}
 			}
+			.scrollTargetLayout()
 			.padding(.vertical, 6)
 		}
 		.scrollIndicators(.hidden)
