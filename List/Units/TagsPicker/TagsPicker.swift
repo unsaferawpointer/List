@@ -62,37 +62,49 @@ extension TagsPicker: View {
 
 	var body: some View {
 		NavigationStack {
-			Form {
-				ForEach(tags, id: \.id) { tag in
-					Button {
-						let state = sources(for: tag.id)
-						switch state {
-						case .off, .mixed:
-							changes[tag.id] = true
-						case .on:
-							changes[tag.id] = false
-						}
-					} label: {
-						HStack {
-							Label(tag.title, systemImage: "tag")
-							Spacer()
-							switch sources(for: tag.id) {
-							case .off:
-								EmptyView()
-							case .mixed:
-								Image(systemName: "minus")
-							case .on:
-								Image(systemName: "checkmark")
-							}
-						}
-						.contentShape(Rectangle())
+			Group {
+				if tags.isEmpty {
+					ContentUnavailableView {
+						Label("No Tags", systemImage: "tag")
+					} description: {
+						Text("Tags make organization easier.\n To create one, go to \"Settings\" → \"Tags\".")
+							.multilineTextAlignment(.center)
 					}
-					.buttonStyle(.plain)
-					.listItemTint(.primary)
+				} else {
+					Form {
+						ForEach(tags, id: \.id) { tag in
+							Button {
+								let state = sources(for: tag.id)
+								switch state {
+								case .off, .mixed:
+									changes[tag.id] = true
+								case .on:
+									changes[tag.id] = false
+								}
+							} label: {
+								HStack {
+									Label(tag.title, systemImage: "tag")
+									Spacer()
+									switch sources(for: tag.id) {
+									case .off:
+										EmptyView()
+									case .mixed:
+										Image(systemName: "minus")
+									case .on:
+										Image(systemName: "checkmark")
+									}
+								}
+								.contentShape(Rectangle())
+							}
+							.buttonStyle(.plain)
+							.listItemTint(.primary)
+						}
+					}
+					.listStyle(.insetGrouped)
 				}
 			}
-			.listStyle(.insetGrouped)
 			.navigationTitle("Select tags")
+			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .close) {
