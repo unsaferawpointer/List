@@ -47,7 +47,7 @@ struct ContentView: View {
 					)
 				} else {
 					List(selection: $model.selection) {
-						if !tags.isEmpty {
+						if !tags.isEmpty && editMode != .active {
 							TagsSection(tags: tags, selectedTags: $model.selectedTags)
 						}
 						Section {
