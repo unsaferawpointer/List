@@ -48,10 +48,15 @@ struct ContentView: View {
 				} else {
 					List(selection: $model.selection) {
 						if !tags.isEmpty && editMode != .active {
-							TagsSection(tags: tags, selectedTags: $model.selectedTags)
+							TagsSection(tags: tags, selectedTags: $model.selectedTags, excludedTags: $model.excludedTags)
 						}
 						Section {
-							FilteredContentView(tags: model.selectedTags, editMode: editMode, moveDisabled: !model.selectedTags.isEmpty) { item in
+							FilteredContentView(
+								tags: model.selectedTags,
+								exclude: model.excludedTags,
+								editMode: editMode,
+								moveDisabled: !model.selectedTags.isEmpty || !model.excludedTags.isEmpty
+							) { item in
 								Toggle(isOn: item.isOn) {
 									Text(model.menuItemTitle(id: .status))
 								}
@@ -106,12 +111,7 @@ struct ContentView: View {
 				}
 			}
 			.sheet(isPresented: $model.isTagPickerPresented) {
-				TagsPicker(items: model.selection) { selected in
-					let filtered = tags.filter { item in
-						selected.contains(item.id)
-					}
-//					item.tags = filtered
-				}
+				TagsPicker(items: model.selection) { _ in }
 			}
 			.toolbar {
 				buildToolbar()

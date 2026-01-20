@@ -48,7 +48,7 @@ extension Item {
 
 	var isCompleted: Bool {
 		get {
-			Status(rawValue: rawStatus) == .done
+			Status(rawValue: rawStatus) != .incomplete
 		}
 		set {
 			rawStatus = newValue ? Status.done.rawValue : Status.incomplete.rawValue

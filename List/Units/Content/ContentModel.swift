@@ -22,6 +22,8 @@ final class ContentModel {
 	var selection: Set<PersistentIdentifier> = []
 
 	var selectedTags: Set<UUID> = []
+
+	var excludedTags: Set<UUID> = []
 }
 
 // MARK: - Context Menu Localization

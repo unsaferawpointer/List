@@ -52,15 +52,29 @@ struct FilteredContentView<V: View> {
 
 	// MARK: - Initialization
 
-	init(tags: Set<UUID>, editMode: EditMode, moveDisabled: Bool, @ViewBuilder menuBuilder: @escaping (Item) -> V) {
+	init(tags: Set<UUID>, exclude: Set<UUID>, editMode: EditMode, moveDisabled: Bool, @ViewBuilder menuBuilder: @escaping (Item) -> V) {
+
+		let normilized = tags.subtracting(exclude)
 
 		let predicate = {
-			if tags.isEmpty {
+			if normilized.isEmpty && exclude.isEmpty {
 				return #Predicate<Item> { _ in true }
+			} else if normilized.isEmpty {
+				return #Predicate<Item> { item in
+					item.tags?.contains { tag in
+						exclude.contains(tag.uuid)
+					} == false
+				}
+			} else if exclude.isEmpty {
+				return #Predicate<Item> { item in
+					item.tags?.contains { tag in
+						normilized.contains(tag.uuid)
+					} == true
+				}
 			} else {
 				return #Predicate<Item> { item in
 					item.tags?.contains { tag in
-						tags.contains(tag.uuid)
+						normilized.contains(tag.uuid) && !exclude.contains(tag.uuid)
 					} == true
 				}
 			}
@@ -102,7 +116,7 @@ extension FilteredContentView: View, DynamicViewContent {
 }
 
 #Preview {
-	FilteredContentView(tags: [], editMode: .inactive, moveDisabled: false) { item in
+	FilteredContentView(tags: [], exclude: [], editMode: .inactive, moveDisabled: false) { item in
 		EmptyView()
 	}
 }
