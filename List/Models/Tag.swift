@@ -17,7 +17,13 @@ final class Tag {
 
 	var title: String = ""
 
+	var isHidden: Bool = false
+
 	var index: Int = 0
+
+	// MARK: - Raw Values
+
+	private(set) var rawIcon: Int = 0
 
 	// MARK: - Relationships
 
@@ -30,11 +36,32 @@ final class Tag {
 		uuid: UUID = .init(),
 		timestamp: Date = .now,
 		title: String,
-		index: Int = 0
+		isHidden: Bool = false,
+		index: Int = 0,
+		rawIcon: Int = 0
 	) {
 		self.uuid = uuid
 		self.timestamp = timestamp
 		self.title = title
+		self.isHidden = isHidden
 		self.index = index
+		self.rawIcon = rawIcon
+	}
+}
+
+// MARK: - Computed Properties
+extension Tag {
+
+	var iconName: IconName? {
+		get {
+			IconName(rawValue: rawIcon)
+		}
+		set {
+			guard let newValue else {
+				rawIcon = IconName.none.rawValue
+				return
+			}
+			rawIcon = newValue.rawValue
+		}
 	}
 }

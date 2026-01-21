@@ -37,8 +37,10 @@ struct TagsEditor: View {
 						HStack {
 							if editMode == .inactive {
 								Image(systemName: "tag")
+									.foregroundStyle(tag.isHidden ? .tertiary : .primary)
 							}
 							Text(tag.title)
+								.foregroundStyle(tag.isHidden ? .tertiary : .primary)
 							Spacer()
 						}
 						.contextMenu {
@@ -79,10 +81,25 @@ struct TagsEditor: View {
 			}
 			ToolbarItem(placement: .bottomBar) {
 				if editMode == .active {
-					Button(role: .destructive) {
-						deleteTags(selected: selection)
+					Menu {
+						Button {
+							setVisibility(selected: selection, newValue: true)
+						} label: {
+							Label("Hide", systemImage: "eye.slash")
+						}
+						Button {
+							setVisibility(selected: selection, newValue: false)
+						} label: {
+							Label("Unhide", systemImage: "eye")
+						}
+						Divider()
+						Button(role: .destructive) {
+							deleteTags(selected: selection)
+						} label: {
+							Label("Delete", systemImage: "trash")
+						}
 					} label: {
-						Label("Delete", systemImage: "trash")
+						Label("Edit...", systemImage: "ellipsis")
 					}
 					.disabled(selection.isEmpty)
 				} else {
@@ -107,6 +124,17 @@ private extension TagsEditor {
 			}
 		}
 		Divider()
+		Button {
+			setVisibility(selected: selected, newValue: true)
+		} label: {
+			Label("Hide", systemImage: "eye.slash")
+		}
+		Button {
+			setVisibility(selected: selected, newValue: false)
+		} label: {
+			Label("Unhide", systemImage: "eye")
+		}
+		Divider()
 		Button(role: .destructive) {
 			deleteTags(selected: selected)
 		} label: {
@@ -117,6 +145,17 @@ private extension TagsEditor {
 
 // MARK: - Helpers
 private extension TagsEditor {
+
+	func setVisibility(selected: Set<PersistentIdentifier>, newValue: Bool) {
+		withAnimation {
+			editMode = .inactive
+			tags.filter {
+				selected.contains($0.id)
+			}.forEach {
+				$0.isHidden = newValue
+			}
+		}
+	}
 
 	func addTag() {
 		withAnimation {

@@ -25,7 +25,7 @@ struct ContentView: View {
 	) private var items: [Item]
 
 	@Query(
-		filter: nil,
+		filter: #Predicate<Tag> { tag in !tag.isHidden },
 		sort:
 			[
 				SortDescriptor(\Tag.index, order: .forward),
