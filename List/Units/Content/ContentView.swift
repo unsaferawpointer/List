@@ -57,26 +57,7 @@ struct ContentView: View {
 								editMode: editMode,
 								moveDisabled: !model.selectedTags.isEmpty || !model.excludedTags.isEmpty
 							) { item in
-								Toggle(isOn: item.isOn) {
-									Text(model.menuItemTitle(id: .status))
-								}
-								Divider()
-								Button {
-									self.model.presentedItem = item
-								} label: {
-									Label(model.menuItemTitle(id: .edit), systemImage: "pencil")
-								}
-								Button {
-									self.model.presentedItemForTagsPicker = item
-								} label: {
-									Label(model.menuItemTitle(id: .tags), systemImage: "tag")
-								}
-								Divider()
-								Button(role: .destructive) {
-									deleteItem(item: item)
-								} label: {
-									Label(model.menuItemTitle(id: .delete), systemImage: "trash")
-								}
+								buildMenu(item: item)
 							}
 							.onMove { indices, target in
 								moveItems(with: indices, to: target)
@@ -123,6 +104,30 @@ struct ContentView: View {
 
 // MARK: - Builders
 extension ContentView {
+
+	@ViewBuilder
+	func buildMenu(item: Item) -> some View {
+		Toggle(isOn: item.isOn) {
+			Text(model.menuItemTitle(id: .status))
+		}
+		Divider()
+		Button {
+			self.model.presentedItem = item
+		} label: {
+			Label(model.menuItemTitle(id: .edit), systemImage: "pencil")
+		}
+		Button {
+			self.model.presentedItemForTagsPicker = item
+		} label: {
+			Label(model.menuItemTitle(id: .tags), systemImage: "tag")
+		}
+		Divider()
+		Button(role: .destructive) {
+			deleteItem(item: item)
+		} label: {
+			Label(model.menuItemTitle(id: .delete), systemImage: "trash")
+		}
+	}
 
 	@ToolbarContentBuilder
 	func buildToolbar() -> some ToolbarContent {
