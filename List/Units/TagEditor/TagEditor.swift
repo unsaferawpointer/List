@@ -15,6 +15,8 @@ struct TagEditor {
 
 	@State var model: Model
 
+	@State var isIconPickerPresented: Bool = false
+
 	var completion: ((Model) -> Void)?
 
 	// MARK: - Initialization
@@ -34,6 +36,17 @@ extension TagEditor: View {
 			Form {
 				LabeledContent("Name") {
 					TextField("Required", text: $model.name)
+				}
+				NavigationLink {
+					IconPicker(icon: $model.iconName)
+				} label: {
+					LabeledContent("Icon") {
+						if model.iconName == .none {
+							Text("No Selected")
+						} else {
+							Image(systemName: model.iconName.imageName ?? "tag")
+						}
+					}
 				}
 			}
 			.navigationTitle(title)
@@ -56,7 +69,7 @@ extension TagEditor: View {
 }
 
 #Preview {
-	TagEditor(title: "Edit Tag", model: .init(name: "Default Tag")) { newModel in
+	TagEditor(title: "Edit Tag", model: .init(name: "Default Tag", iconName: .bolt)) { newModel in
 
 	}
 }

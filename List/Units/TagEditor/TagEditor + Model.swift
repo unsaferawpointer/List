@@ -11,5 +11,6 @@ extension TagEditor {
 
 	struct Model {
 		var name: String
+		var iconName: IconName
 	}
 }

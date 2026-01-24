@@ -36,7 +36,7 @@ struct TagsEditor: View {
 					ForEach(tags) { tag in
 						HStack {
 							if editMode == .inactive {
-								Image(systemName: "tag")
+								Image(systemName: tag.iconName.imageName ?? "tag")
 									.foregroundStyle(tag.isHidden ? .tertiary : .primary)
 							}
 							Text(tag.title)
@@ -60,15 +60,16 @@ struct TagsEditor: View {
 			}
 		}
 		.sheet(isPresented: $isPresented) {
-			TagEditor(title: "New Tag", model: .init(name: "")) { newModel in
+			TagEditor(title: "New Tag", model: .init(name: "", iconName: .none)) { newModel in
 				withAnimation {
-					model.addTag(with: newModel.name, to: modelContext, allTags: tags)
+					model.addTag(with: newModel.name, iconName: newModel.iconName, to: modelContext, allTags: tags)
 				}
 			}
 		}
 		.sheet(item: $presented) { tag in
-			TagEditor(title: "Edit Tag", model: .init(name: tag.title)) { newModel in
+			TagEditor(title: "Edit Tag", model: .init(name: tag.title, iconName: tag.iconName)) { newModel in
 				tag.title = newModel.name
+				tag.iconName = newModel.iconName
 			}
 		}
 		.navigationTitle("All Tags")

@@ -19,8 +19,9 @@ import SwiftUI
 
 extension TagsEditor.Model {
 
-	func addTag(with name: String, to modelContext: ModelContext, allTags: [Tag]) {
+	func addTag(with name: String, iconName: IconName, to modelContext: ModelContext, allTags: [Tag]) {
 		let newTag = Tag(title: name)
+		newTag.iconName = iconName
 		newTag.index = (allTags.last?.index ?? 0) + 1
 		modelContext.insert(newTag)
 	}

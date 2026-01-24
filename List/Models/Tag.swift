@@ -52,15 +52,11 @@ final class Tag {
 // MARK: - Computed Properties
 extension Tag {
 
-	var iconName: IconName? {
+	var iconName: IconName {
 		get {
-			IconName(rawValue: rawIcon)
+			IconName(rawValue: rawIcon) ?? .none
 		}
 		set {
-			guard let newValue else {
-				rawIcon = IconName.none.rawValue
-				return
-			}
 			rawIcon = newValue.rawValue
 		}
 	}

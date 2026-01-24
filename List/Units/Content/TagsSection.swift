@@ -28,7 +28,7 @@ struct TagsSection: View {
 			) {
 				ForEach(tags) { tag in
 					HStack {
-						Image(systemName: excludedTags.contains(tag.uuid) ? "xmark.circle" : "tag")
+						Image(systemName: excludedTags.contains(tag.uuid) ? "xmark.circle" : tag.iconName.imageName ?? "tag")
 							.foregroundStyle(excludedTags.contains(tag.uuid) ? .red : .primary)
 						Text(tag.title)
 							.foregroundStyle(excludedTags.contains(tag.uuid) ? .red : .primary)
