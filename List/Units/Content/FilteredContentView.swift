@@ -52,36 +52,10 @@ struct FilteredContentView<V: View> {
 
 	// MARK: - Initialization
 
-	init(tags: Set<UUID>, exclude: Set<UUID>, editMode: EditMode, moveDisabled: Bool, @ViewBuilder menuBuilder: @escaping (Item) -> V) {
-
-		let normilized = tags.subtracting(exclude)
-
-		let predicate = {
-			if normilized.isEmpty && exclude.isEmpty {
-				return #Predicate<Item> { _ in true }
-			} else if normilized.isEmpty {
-				return #Predicate<Item> { item in
-					item.tags?.contains { tag in
-						exclude.contains(tag.uuid)
-					} == false
-				}
-			} else if exclude.isEmpty {
-				return #Predicate<Item> { item in
-					item.tags?.contains { tag in
-						normilized.contains(tag.uuid)
-					} == true
-				}
-			} else {
-				return #Predicate<Item> { item in
-					item.tags?.contains { tag in
-						normilized.contains(tag.uuid) && !exclude.contains(tag.uuid)
-					} == true
-				}
-			}
-		}()
+	init(filter: Filter, editMode: EditMode, moveDisabled: Bool, @ViewBuilder menuBuilder: @escaping (Item) -> V) {
 
 		self._filteredItems = Query(
-			filter: predicate,
+			filter: filter.predicate,
 			sort:
 				[
 					SortDescriptor(\Item.index, order: .forward),
@@ -116,7 +90,7 @@ extension FilteredContentView: View, DynamicViewContent {
 }
 
 #Preview {
-	FilteredContentView(tags: [], exclude: [], editMode: .inactive, moveDisabled: false) { item in
+	FilteredContentView(filter: .init(includedTag: [], excludedTag: []), editMode: .inactive, moveDisabled: false) { item in
 		EmptyView()
 	}
 }

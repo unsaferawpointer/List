@@ -48,14 +48,13 @@ struct ContentView: View {
 				} else {
 					List(selection: $model.selection) {
 						if !tags.isEmpty && editMode != .active {
-							TagsSection(tags: tags, selectedTags: $model.selectedTags, excludedTags: $model.excludedTags)
+							TagsSection(tags: tags, filter: $model.filter)
 						}
 						Section {
 							FilteredContentView(
-								tags: model.selectedTags,
-								exclude: model.excludedTags,
+								filter: model.filter,
 								editMode: editMode,
-								moveDisabled: !model.selectedTags.isEmpty || !model.excludedTags.isEmpty
+								moveDisabled: model.filter.isEmpty
 							) { item in
 								buildMenu(item: item)
 							}

@@ -58,11 +58,6 @@ struct IconNameCell: View {
 				RoundedRectangle(cornerRadius: 12)
 					.stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 2)
 			)
-//			Text("IconName")
-//				.font(.caption2)
-//				.multilineTextAlignment(.center)
-//				.lineLimit(2)
-//				.foregroundColor(isSelected ? .accentColor : .primary)
 		}
 		.frame(width: 80)
 	}

@@ -21,9 +21,7 @@ final class ContentModel {
 
 	var selection: Set<PersistentIdentifier> = []
 
-	var selectedTags: Set<UUID> = []
-
-	var excludedTags: Set<UUID> = []
+	var filter: Filter = .init()
 }
 
 // MARK: - Context Menu Localization
@@ -64,7 +62,7 @@ extension ContentModel {
 	}
 
 	func navigationTitle(isEditMode: Bool, tags: [Tag]) -> String {
-		let isFiltering = !tags.isEmpty && !selectedTags.isEmpty
+		let isFiltering = !tags.isEmpty && !filter.includedTag.isEmpty
 		guard !isFiltering else {
 			return String(localized: "Filtered by tags", table: "ContentLocalizable")
 		}
@@ -74,12 +72,12 @@ extension ContentModel {
 	}
 
 	func navigationSubtitle(isEditMode: Bool, tags: [Tag], items: [Item]) -> String {
-		let isFiltering = !tags.isEmpty && !selectedTags.isEmpty
+		let isFiltering = !tags.isEmpty && !filter.includedTag.isEmpty
 		guard isFiltering else {
 			return "\(items.count) Items"
 		}
 		return tags.filter {
-			selectedTags.contains($0.uuid)
+			filter.includedTag.contains($0.uuid)
 		}
 		.map(\.title)
 		.joined(separator: ", ")

@@ -11,9 +11,7 @@ struct TagsSection: View {
 
 	let tags: [Tag]
 
-	@Binding var selectedTags: Set<UUID>
-
-	@Binding var excludedTags: Set<UUID>
+	@Binding var filter: Filter
 
 	private let rows = [
 		GridItem(.fixed(32), spacing: 8)
@@ -28,10 +26,10 @@ struct TagsSection: View {
 			) {
 				ForEach(tags) { tag in
 					HStack {
-						Image(systemName: excludedTags.contains(tag.uuid) ? "xmark.circle" : tag.iconName.imageName ?? "tag")
-							.foregroundStyle(excludedTags.contains(tag.uuid) ? .red : .primary)
+						Image(systemName: filter.excludedTag.contains(tag.uuid) ? "xmark.circle" : tag.iconName.imageName ?? "tag")
+							.foregroundStyle(filter.excludedTag.contains(tag.uuid) ? .red : .primary)
 						Text(tag.title)
-							.foregroundStyle(excludedTags.contains(tag.uuid) ? .red : .primary)
+							.foregroundStyle(filter.excludedTag.contains(tag.uuid) ? .red : .primary)
 							.font(.callout)
 							.fontWeight(.regular)
 						}
@@ -40,21 +38,21 @@ struct TagsSection: View {
 					.background {
 						Capsule(style: .continuous)
 							.fill(
-								!selectedTags.contains(tag.uuid) || excludedTags.contains(tag.uuid)
+								!filter.includedTag.contains(tag.uuid) || filter.excludedTag.contains(tag.uuid)
 									? Color(uiColor: .quaternarySystemFill)
 									: Color(uiColor: .tintColor).opacity(0.4)
 							)
 					}
 					.onTapGesture {
 						withAnimation {
-							if selectedTags.contains(tag.uuid) {
-								excludedTags.insert(tag.uuid)
-								selectedTags.remove(tag.uuid)
+							if filter.includedTag.contains(tag.uuid) {
+								filter.excludedTag.insert(tag.uuid)
+								filter.includedTag.remove(tag.uuid)
 							} else {
-								if excludedTags.contains(tag.uuid) {
-									excludedTags.remove(tag.uuid)
+								if filter.excludedTag.contains(tag.uuid) {
+									filter.excludedTag.remove(tag.uuid)
 								} else {
-									selectedTags.insert(tag.uuid)
+									filter.includedTag.insert(tag.uuid)
 								}
 							}
 						}
@@ -83,7 +81,7 @@ struct TagsSection: View {
 			.init(title: "Music"),
 			.init(title: "Travel")
 		],
-		selectedTags: .constant([]), excludedTags: .constant([])
+		filter: .constant(Filter())
 	)
 	.padding()
 }
