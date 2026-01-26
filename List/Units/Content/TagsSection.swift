@@ -25,32 +25,22 @@ struct TagsSection: View {
 				spacing: 8
 			) {
 				ForEach(tags) { tag in
-					HStack {
-						Image(systemName: filter.excludedTag.contains(tag.uuid) ? "xmark.circle" : tag.iconName.imageName ?? "tag")
-							.foregroundStyle(filter.excludedTag.contains(tag.uuid) ? .red : .primary)
-						Text(tag.title)
-							.foregroundStyle(filter.excludedTag.contains(tag.uuid) ? .red : .primary)
-							.font(.callout)
-							.fontWeight(.regular)
-						}
-					.padding(.horizontal, 12)
-					.padding(.vertical, 8)
-					.background {
-						Capsule(style: .continuous)
-							.fill(
-								!filter.includedTag.contains(tag.uuid) || filter.excludedTag.contains(tag.uuid)
-									? Color(uiColor: .quaternarySystemFill)
-									: Color(uiColor: .tintColor).opacity(0.4)
-							)
-					}
-					.onTapGesture {
+					TagView(
+						title: tag.title,
+						foregroundColor: filter.excludedTag.contains(tag.uuid) ? .red : .label,
+						backgroundColor: !filter.includedTag.contains(tag.uuid) || filter.excludedTag.contains(tag.uuid)
+							? .systemFill
+							: .tintColor.withAlphaComponent(0.3),
+						imageName: filter.excludedTag.contains(tag.uuid) ? "xmark.circle" : tag.iconName.imageName ?? "tag",
+						menuItems: buildMenu(for: tag)
+					) {
 						withAnimation {
 							if filter.includedTag.contains(tag.uuid) {
-								filter.excludedTag.insert(tag.uuid)
 								filter.includedTag.remove(tag.uuid)
 							} else {
 								if filter.excludedTag.contains(tag.uuid) {
 									filter.excludedTag.remove(tag.uuid)
+									filter.includedTag.insert(tag.uuid)
 								} else {
 									filter.includedTag.insert(tag.uuid)
 								}
@@ -65,6 +55,28 @@ struct TagsSection: View {
 		.scrollIndicators(.hidden)
 		.scrollTargetBehavior(.viewAligned)
 		.listRowSeparator(.hidden)
+	}
+}
+
+extension TagsSection {
+
+	func buildMenu(for tag: Tag) -> [UIAction] {
+		let isExcluded = filter.excludedTag.contains(tag.uuid)
+		return
+		[
+			UIAction(
+				title: isExcluded ? "Include" : "Exclude",
+				image: UIImage(systemName: isExcluded ? "plus.circle.fill" : "xmark.circle")
+			) { _ in
+				if isExcluded {
+					filter.excludedTag.remove(tag.uuid)
+					filter.includedTag.insert(tag.uuid)
+				} else {
+					filter.excludedTag.insert(tag.uuid)
+					filter.includedTag.remove(tag.uuid)
+				}
+			}
+		]
 	}
 }
 
