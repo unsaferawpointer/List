@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#if os(iOS)
 struct TagsSection: View {
 
 	let tags: [Tag]
@@ -97,3 +98,4 @@ extension TagsSection {
 	)
 	.padding()
 }
+#endif

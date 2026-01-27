@@ -8,6 +8,8 @@
 import SwiftUI
 import SwiftData
 
+#if os(iOS)
+
 struct TagsEditor: View {
 
 	@Environment(\.modelContext) private var modelContext
@@ -176,3 +178,4 @@ private extension TagsEditor {
 	TagsEditor()
 		.modelContainer(for: Tag.self, inMemory: true)
 }
+#endif

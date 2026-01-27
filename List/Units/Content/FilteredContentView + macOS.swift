@@ -1,19 +1,17 @@
 //
-//  FilteredContentView.swift
+//  FilteredContentView + macOS.swift
 //  List
 //
-//  Created by Anton Cherkasov on 10.01.2026.
+//  Created by Anton Cherkasov on 27.01.2026.
 //
 
 import SwiftUI
 import SwiftData
 
-#if os(iOS)
+#if os(macOS)
 struct FilteredContentView<V: View> {
 
 	@Environment(\.modelContext) private var modelContext
-
-	let editMode: EditMode
 
 	let moveDisabled: Bool
 
@@ -53,7 +51,7 @@ struct FilteredContentView<V: View> {
 
 	// MARK: - Initialization
 
-	init(filter: Filter, editMode: EditMode, moveDisabled: Bool, @ViewBuilder menuBuilder: @escaping (Item) -> V) {
+	init(filter: Filter, moveDisabled: Bool, @ViewBuilder menuBuilder: @escaping (Item) -> V) {
 
 		self._filteredItems = Query(
 			filter: filter.predicate,
@@ -64,34 +62,47 @@ struct FilteredContentView<V: View> {
 				],
 			animation: .default
 		)
-		self.editMode = editMode
 		self.moveDisabled = moveDisabled
 		self.menuBuilder = menuBuilder
 	}
 }
 
 // MARK: - View
-extension FilteredContentView: View, DynamicViewContent {
+extension FilteredContentView: View {
+
+	var body: some View {
+		if filteredItems.isEmpty {
+			ContentUnavailableView(
+				"No Tasks",
+				systemImage: "shippingbox",
+				description: Text("Tap \"+\" to add your first task.")
+			)
+		} else {
+			ForEach(filteredItems) { item in
+				ItemView(item: item)
+					.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
+					.listRowSeparator(.hidden)
+					.moveDisabled(moveDisabled)
+					.contextMenu {
+						menuBuilder(item)
+					}
+			}
+		}
+	}
+}
+
+// MARK: - DynamicViewContent
+extension FilteredContentView: DynamicViewContent {
 
 	var data: Array<Item> {
 		filteredItems
 	}
 
 	typealias Data = Array<Item>
-
-	var body: some View {
-		ForEach(filteredItems) { item in
-			ItemView(isEditing: editMode == .active, item: item)
-				.moveDisabled(moveDisabled)
-				.contextMenu {
-					menuBuilder(item)
-				}
-		}
-	}
 }
 
 #Preview {
-	FilteredContentView(filter: .init(includedTag: [], excludedTag: []), editMode: .inactive, moveDisabled: false) { item in
+	FilteredContentView(filter: .init(includedTag: [], excludedTag: []), moveDisabled: false) { item in
 		EmptyView()
 	}
 }

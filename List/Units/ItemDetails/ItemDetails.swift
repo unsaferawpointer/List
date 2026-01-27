@@ -42,7 +42,9 @@ struct ItemDetails: View {
 				}
 			}
 			.navigationTitle(title)
+			#if os(iOS)
 			.navigationBarTitleDisplayMode(.inline)
+			#endif
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .close) {

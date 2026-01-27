@@ -100,19 +100,20 @@ extension TagsPicker: View {
 							.listItemTint(.primary)
 						}
 					}
+					#if os(iOS)
 					.listStyle(.insetGrouped)
+					#endif
 				}
 			}
 			.navigationTitle("Select tags")
+			#if os(iOS)
 			.navigationBarTitleDisplayMode(.inline)
+			#endif
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .close) {
 						dismiss()
 					}
-				}
-				ToolbarItem(placement: .bottomBar) {
-					Spacer()
 				}
 				ToolbarItem(placement: .confirmationAction) {
 					Button(role: .confirm) {

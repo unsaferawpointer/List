@@ -8,6 +8,8 @@
 import Foundation
 import SwiftData
 
+#if os(iOS)
+
 extension TagsEditor {
 
 	final class Model {
@@ -45,3 +47,4 @@ extension TagsEditor.Model {
 		}
 	}
 }
+#endif

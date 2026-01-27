@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+
+#if canImport(UIKit)
 import UIKit
 
 // MARK: - SwiftUI View для тега с контекстным меню
@@ -72,3 +74,4 @@ private extension TagView {
 		return configuration
 	}
 }
+#endif
