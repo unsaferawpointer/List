@@ -94,6 +94,14 @@ extension ContentModel {
 		}
 		modelContext.insert(newItem)
 	}
+
+	func editItem(_ item: Item) {
+		presentedItem = item
+	}
+
+	func showTagsPicker(for item: Item) {
+		presentedItemForTagsPicker = item
+	}
 }
 
 extension ContentModel {

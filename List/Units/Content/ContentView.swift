@@ -52,12 +52,12 @@ extension ContentView {
 		}
 		Divider()
 		Button {
-			self.model.presentedItem = item
+			model.editItem(item)
 		} label: {
 			Label(model.menuItemTitle(id: .edit), systemImage: "pencil")
 		}
 		Button {
-			self.model.presentedItemForTagsPicker = item
+			model.showTagsPicker(for: item)
 		} label: {
 			Label(model.menuItemTitle(id: .tags), systemImage: "tag")
 		}
