@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 
+#if os(iOS)
 struct TagsPicker {
 
 	@Environment(\.dismiss) var dismiss
@@ -92,3 +93,62 @@ extension TagsPicker: View {
 		.modelContainer(for: Tag.self, inMemory: true)
 		.modelContainer(for: Item.self, inMemory: true)
 }
+#elseif os(macOS)
+struct TagsPicker {
+
+	@Environment(\.modelContext) private var modelContext
+
+	@Query private var tags: [Tag]
+	@Query private var items: [Item]
+
+	// MARK: - Initialization
+
+	init(selected: Set<PersistentIdentifier>) {
+		let predicate = #Predicate<Item> { item in
+			selected.contains(item.id)
+		}
+		self._items = Query(filter: predicate, animation: .default)
+		self._tags = Query(sort: [.byIndex, .byTimestamp], animation: .default)
+	}
+}
+
+// MARK: - View
+extension TagsPicker: View {
+
+	var body: some View {
+		ForEach(tags) { tag in
+			Toggle(sources: sources(for: tag), isOn: \.self) {
+				Label(tag.title, systemImage: tag.iconName.imageName ?? "tag")
+			}
+		}
+	}
+}
+
+// MARK: - Helpers
+private extension TagsPicker {
+
+	func sources(for tag: Tag) -> [Binding<Bool>] {
+		items.map { item in
+			Binding {
+				item.tags?.contains {
+					$0.id == tag.id
+				} == true
+			} set: { newValue in
+				if newValue {
+					item.tags?.append(tag)
+				} else {
+					item.tags?.removeAll {
+						$0.id == tag.id
+					}
+				}
+			}
+		}
+	}
+}
+
+#Preview {
+	TagsPicker(selected: [])
+		.modelContainer(for: Tag.self, inMemory: true)
+		.modelContainer(for: Item.self, inMemory: true)
+}
+#endif

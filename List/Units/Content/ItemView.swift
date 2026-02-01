@@ -54,16 +54,37 @@ struct ItemView: View {
 
 	var item: Item
 
+	@FocusState var focus: Bool
+
+	@State var text: String
+
+	let onChange: (String) -> Void
+
+	// MARK: - Initialization
+
+	init(item: Item, onChange: @escaping (String) -> Void = { _ in }) {
+		self.item = item
+		self._text = State(initialValue: item.text)
+		self.onChange = onChange
+	}
+
 	var body: some View {
 		HStack(spacing: 16) {
 			Circle()
 				.foregroundStyle(item.isCompleted ? .tertiary : .secondary)
 				.frame(width: 4, height: 4)
 			VStack(alignment: .leading) {
-				Text(item.text)
+				TextField("Required", text: $text)
+					.focused($focus)
 					.foregroundStyle(item.isCompleted ? .secondary : .primary)
 					.lineLimit(2)
 					.strikethrough(item.isCompleted)
+					.onSubmit {
+						onChange(text)
+					}
+					.onChange(of: focus) {
+						onChange(text)
+					}
 				if !(item.tags?.isEmpty == true) {
 					Text(item.tags?.map(\.title).joined(separator: " | ") ?? "")
 						.font(.caption)
@@ -76,13 +97,13 @@ struct ItemView: View {
 
 #Preview(traits: .sizeThatFitsLayout) {
 	ItemView(item: .init(text: "Default Item"))
-		.frame(minWidth: 320, alignment: .leading)
-		.padding()
+	.frame(minWidth: 320, alignment: .leading)
+	.padding()
 	ItemView(item: .init(text: "Completed Item", rawStatus: Status.done.rawValue))
-		.frame(minWidth: 320, alignment: .leading)
-		.padding()
+	.frame(minWidth: 320, alignment: .leading)
+	.padding()
 	ItemView(item: .init(text: "Editing Item"))
-		.frame(minWidth: 320, alignment: .leading)
-		.padding()
+	.frame(minWidth: 320, alignment: .leading)
+	.padding()
 }
 #endif

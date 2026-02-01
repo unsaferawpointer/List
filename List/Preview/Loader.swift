@@ -9,7 +9,7 @@ import Foundation
 
 final class Loader {
 
-	func loadTextFileFromBundle(filename: String, withExtension: String) -> String? {
+	static func loadTextFileFromBundle(filename: String, withExtension: String) -> String? {
 		guard let fileURL = Bundle.main.url(forResource: filename, withExtension: withExtension) else {
 			return nil
 		}
