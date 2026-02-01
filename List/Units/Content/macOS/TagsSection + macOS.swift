@@ -9,6 +9,8 @@ import SwiftUI
 import SwiftData
 
 #if os(macOS)
+import AppKit
+
 struct TagsSection: View {
 
 	@Query(
@@ -25,8 +27,21 @@ struct TagsSection: View {
 		ScrollView(.horizontal) {
 			HStack {
 				ForEach(tags) { tag in
-					Toggle(isOn: isOn(for: tag)) {
-						Label(tag.title, systemImage: tag.iconName.imageName ?? "tag")
+					TagView(
+						title: tag.title,
+						foregroundColor: excludedTags.contains(tag.uuid) ? .systemRed : .secondaryLabelColor,
+						imageName: excludedTags.contains(tag.uuid) ? "xmark.circle" : tag.iconName.imageName ?? "tag",
+						isOn: includedTags.contains(tag.uuid) || excludedTags.contains(tag.uuid)
+					) {
+						if includedTags.contains(tag.uuid) {
+							includedTags.remove(tag.uuid)
+						} else {
+							includedTags.insert(tag.uuid)
+						}
+						excludedTags.remove(tag.uuid)
+					} onExclude: {
+						excludedTags.insert(tag.uuid)
+						includedTags.remove(tag.uuid)
 					}
 				}
 			}

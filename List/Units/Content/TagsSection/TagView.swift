@@ -10,7 +10,7 @@ import SwiftUI
 #if canImport(UIKit)
 import UIKit
 
-// MARK: - SwiftUI View для тега с контекстным меню
+// MARK: - UIViewRepresentable
 struct TagView: UIViewRepresentable {
 
 	let title: String
@@ -72,6 +72,94 @@ private extension TagView {
 		configuration.imagePadding = 6
 		configuration.buttonSize = .mini
 		return configuration
+	}
+}
+#elseif os(macOS)
+import AppKit
+
+// MARK: - NSViewRepresentable
+struct TagView: NSViewRepresentable {
+
+	let title: String
+
+	let foregroundColor: NSColor
+
+	var imageName: String
+
+	var isOn: Bool
+
+	var onTap: (() -> Void)?
+
+	var onExclude: (() -> Void)?
+
+	func makeNSView(context: Context) -> NSButton {
+		let button = NSButton()
+		configure(button)
+		button.action = #selector(Coordinator.buttonTapped(_:))
+		button.target = context.coordinator
+
+		button.menu = {
+			let menu = NSMenu()
+			menu.addItem(
+				{
+					let item = NSMenuItem()
+					item.title = "Exclude"
+					item.action = #selector(Coordinator.excludeButtonTapped)
+					item.image = NSImage(systemSymbolName: "xmark.circle", accessibilityDescription: nil)
+					item.target = context.coordinator
+					return item
+				}()
+			)
+			return menu
+		}()
+
+		context.coordinator.action = onTap
+		context.coordinator.onExclude = onExclude
+		return button
+	}
+
+	func updateNSView(_ nsView: NSButton, context: Context) {
+		configure(nsView)
+
+		context.coordinator.action = onTap
+		context.coordinator.onExclude = onExclude
+	}
+
+	func makeCoordinator() -> Coordinator {
+		Coordinator()
+	}
+
+	class Coordinator {
+
+		var action: (() -> Void)?
+
+		var onExclude: (() -> Void)?
+
+		@objc func buttonTapped(_ sender: NSButton) {
+			action?()
+		}
+
+		@objc func excludeButtonTapped(_ sender: NSMenuItem) {
+			onExclude?()
+		}
+	}
+}
+
+// MARK: - Helpers
+private extension TagView {
+
+	func configure(_ button: NSButton) {
+		button.title = title
+		button.image = NSImage(systemSymbolName: imageName, accessibilityDescription: nil)
+		button.imagePosition = .imageLeading
+		button.bezelStyle = .accessoryBar
+		button.bezelColor = foregroundColor
+		button.borderShape = .capsule
+		button.isBordered = true
+		button.setButtonType(.pushOnPushOff)
+		button.tintProminence = .none
+
+		button.state = isOn ? .on : .off
 	}
 }
 #endif
