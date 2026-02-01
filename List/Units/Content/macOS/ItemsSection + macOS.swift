@@ -33,11 +33,7 @@ extension ItemsSection: View {
 		ForEach(items) { item in
 			ItemView(item: item) { text in
 				withAnimation {
-					guard !text.isEmpty else {
-						modelContext.delete(item)
-						return
-					}
-					item.text = text
+					DataManager.updateItem(item, with: text, in: modelContext)
 				}
 			}
 			.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))

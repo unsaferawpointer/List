@@ -80,13 +80,9 @@ private extension ContentView {
 
 	func addItem() {
 		withAnimation {
-			let newItem = Item(text: "New Item")
-			for (index, item) in items.enumerated() {
-				item.index = index + 1
-			}
-			modelContext.insert(newItem)
+			let id = DataManager.addItem(with: "New Item", to: modelContext, all: items)
 			withAnimation {
-				scrollPosition = newItem.id
+				scrollPosition = id
 			}
 		}
 	}
@@ -109,12 +105,7 @@ private extension ContentView {
 		}
 		Divider()
 		Button(role: .destructive) {
-			let filtered = items.filter {
-				selected.contains($0.id)
-			}
-			for item in filtered {
-				modelContext.delete(item)
-			}
+			DataManager.deleteItems(selected, in: modelContext, all: items)
 		} label: {
 			Label("Delete", systemImage: "trash")
 		}
