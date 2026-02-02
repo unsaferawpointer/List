@@ -20,6 +20,9 @@ struct Filter {
 	}
 }
 
+// MARK: - Codable
+extension Filter: Codable { }
+
 // MARK: - Hashable
 extension Filter: Hashable { }
 

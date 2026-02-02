@@ -14,13 +14,32 @@ struct ContentView {
 
 	@Environment(\.modelContext) var modelContext
 
-	@State var filter: Filter = .init()
+	@AppStorage("filter") private var filterSettings: Data?
 
 	@State var selection: Set<PersistentIdentifier> = []
 
 	@Query(sort: [SortDescriptor<Item>.byIndex, .byTimestamp], animation: .default) var items: [Item]
 
 	@State var scrollPosition: PersistentIdentifier?
+}
+
+// MARK: - Computed Properties
+extension ContentView {
+
+	var filter: Binding<Filter> {
+		Binding {
+			guard let data = filterSettings else {
+				return Filter()
+			}
+			return (try? JSONDecoder().decode(Filter.self, from: data)) ?? Filter()
+		} set: { newValue in
+			guard let data = try? JSONEncoder().encode(newValue) else {
+				filterSettings = nil
+				return
+			}
+			filterSettings = data
+		}
+	}
 }
 
 // MARK: - View
@@ -31,11 +50,11 @@ extension ContentView: View {
 			ScrollViewReader { proxy in
 				List(selection: $selection) {
 					TagsSection(
-						includedTags: $filter.includedTag,
-						excludedTags: $filter.excludedTag
+						includedTags: filter.includedTag,
+						excludedTags: filter.excludedTag
 					)
 					.padding(.init(top: 0, leading: 8, bottom: 8, trailing: 8))
-					ItemsSection(filter: filter)
+					ItemsSection(filter: filter.wrappedValue)
 				}
 				.contextMenu(forSelectionType: PersistentIdentifier.self) { selected in
 					buildMenu(for: selected)

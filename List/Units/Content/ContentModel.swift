@@ -20,8 +20,6 @@ final class ContentModel {
 	var isTagPickerPresented: Bool = false
 
 	var selection: Set<PersistentIdentifier> = []
-
-	var filter: Filter = .init()
 }
 
 // MARK: - Context Menu Localization
@@ -61,7 +59,7 @@ extension ContentModel {
 		String(localized: "No Tasks", table: "ContentLocalizable")
 	}
 
-	func navigationTitle(isEditMode: Bool, tags: [Tag]) -> String {
+	func navigationTitle(isEditMode: Bool, tags: [Tag], filter: Filter) -> String {
 		let isFiltering = !tags.isEmpty && !filter.includedTag.isEmpty
 		guard !isFiltering else {
 			return String(localized: "Filtered by tags", table: "ContentLocalizable")
@@ -71,7 +69,7 @@ extension ContentModel {
 			: String(localized: "All Items", table: "ContentLocalizable")
 	}
 
-	func navigationSubtitle(isEditMode: Bool, tags: [Tag], items: [Item]) -> String {
+	func navigationSubtitle(isEditMode: Bool, tags: [Tag], items: [Item], filter: Filter) -> String {
 		let isFiltering = !tags.isEmpty && !filter.includedTag.isEmpty
 		guard isFiltering else {
 			return "\(items.count) Items"

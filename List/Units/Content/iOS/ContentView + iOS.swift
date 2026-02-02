@@ -15,6 +15,8 @@ struct ContentView {
 	@State var editMode: EditMode = .inactive
 	#endif
 
+	@AppStorage("filter") private var filterSettings: Data?
+
 	@Environment(\.modelContext) var modelContext
 	@Environment(\.undoManager) private var undoManager
 
@@ -32,6 +34,25 @@ struct ContentView {
 
 }
 
+// MARK: - Computed Properties
+extension ContentView {
+
+	var filter: Binding<Filter> {
+		Binding {
+			guard let data = filterSettings else {
+				return Filter()
+			}
+			return (try? JSONDecoder().decode(Filter.self, from: data)) ?? Filter()
+		} set: { newValue in
+			guard let data = try? JSONEncoder().encode(newValue) else {
+				filterSettings = nil
+				return
+			}
+			filterSettings = data
+		}
+	}
+}
+
 // MARK: - View
 extension ContentView: View {
 
@@ -47,13 +68,13 @@ extension ContentView: View {
 				} else {
 					List(selection: $model.selection) {
 						if !tags.isEmpty && editMode != .active {
-							TagsSection(tags: tags, filter: $model.filter)
+							TagsSection(tags: tags, filter: filter)
 						}
 						Section {
 							FilteredContentView(
-								filter: model.filter,
+								filter: filter.wrappedValue,
 								editMode: editMode,
-								moveDisabled: model.filter.isEmpty
+								moveDisabled: filter.wrappedValue.isEmpty
 							) { item in
 								buildMenu(item: item)
 							}
@@ -66,10 +87,10 @@ extension ContentView: View {
 				}
 			}
 			.navigationTitle(
-				model.navigationTitle(isEditMode: editMode == .active, tags: tags)
+				model.navigationTitle(isEditMode: editMode == .active, tags: tags, filter: filter.wrappedValue)
 			)
 			.navigationSubtitle(
-				model.navigationSubtitle(isEditMode: editMode == .active, tags: tags, items: items)
+				model.navigationSubtitle(isEditMode: editMode == .active, tags: tags, items: items, filter: filter.wrappedValue)
 			)
 			.sheet(isPresented: $model.isItemEditorPresented) {
 				ItemDetails(title: model.itemEditorTitle(isNew: true), text: "") { newText in
