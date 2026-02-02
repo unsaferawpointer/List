@@ -104,11 +104,8 @@ struct TagsPicker {
 	// MARK: - Initialization
 
 	init(selected: Set<PersistentIdentifier>) {
-		let predicate = #Predicate<Item> { item in
-			selected.contains(item.id)
-		}
-		self._items = Query(filter: predicate, animation: .default)
-		self._tags = Query(sort: [.byIndex, .byTimestamp], animation: .default)
+		self._items = .concrete(ids: selected)
+		self._tags = .all
 	}
 }
 
