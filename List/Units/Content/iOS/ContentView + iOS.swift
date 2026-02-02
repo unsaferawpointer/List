@@ -221,13 +221,13 @@ extension ContentView {
 
 	func addItem(with text: String) {
 		withAnimation {
-			model.addItem(text: text, to: modelContext, allItems: items)
+			_ = DataManager.addItem(with: text, to: modelContext, all: items)
 		}
 	}
 
 	func updateItem(_ item: Item, newText: String) {
 		withAnimation {
-			item.text = newText
+			DataManager.updateItem(item, with: newText, in: modelContext)
 		}
 	}
 
@@ -239,30 +239,25 @@ extension ContentView {
 
 	func deleteSelectedItems() {
 		withAnimation {
-			let filtered = items.filter {
-				model.selection.contains($0.id)
-			}
+			DataManager.deleteItems(
+				model.selection,
+				in: modelContext,
+				all: items
+			)
 			model.selection.removeAll()
-			for item in filtered {
-				modelContext.delete(item)
-			}
 			editMode = .inactive
 		}
 	}
 
 	func deleteItem(item: Item) {
 		withAnimation {
-			modelContext.delete(item)
+			DataManager.deleteItem(item, in: modelContext)
 		}
 	}
 
 	func moveItems(with indices: IndexSet, to target: Int) {
 		withAnimation {
-			var modificated = items
-			modificated.move(fromOffsets: indices, toOffset: target)
-			for (index, item) in modificated.enumerated() {
-				item.index = index
-			}
+			DataManager.moveItems(indices, to: target, in: modelContext, all: items)
 		}
 	}
 }

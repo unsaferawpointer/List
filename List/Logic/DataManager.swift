@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 import SwiftData
 
 final class DataManager {
@@ -15,6 +16,7 @@ final class DataManager {
 // MARK: - Public Interface
 extension DataManager {
 
+	@discardableResult
 	static func addItem(with text: String, to context: ModelContext, all: [Item]) -> PersistentIdentifier {
 		let new = Item(text: text)
 		for (index, item) in all.enumerated() {
@@ -31,6 +33,20 @@ extension DataManager {
 		try? context.transaction {
 			for item in filtered {
 				context.delete(item)
+			}
+		}
+	}
+
+	static func deleteItem(_ item: Item, in context: ModelContext) {
+		context.delete(item)
+	}
+
+	static func moveItems(_ indices: IndexSet, to target: Int, in context: ModelContext, all: [Item]) {
+		var modificated = all
+		modificated.move(fromOffsets: indices, toOffset: target)
+		try? context.transaction {
+			for (index, item) in modificated.enumerated() {
+				item.index = index
 			}
 		}
 	}
