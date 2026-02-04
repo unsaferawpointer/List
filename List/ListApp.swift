@@ -11,17 +11,29 @@ import SwiftData
 @main
 struct ListApp: App {
 
+	var sharedModelContainer: ModelContainer = {
+		let schema = Schema([
+			Item.self,
+			Tag.self
+		])
+		let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+
+		do {
+			return try ModelContainer(for: schema, configurations: [modelConfiguration])
+		} catch {
+			fatalError("Could not create ModelContainer: \(error)")
+		}
+	}()
+
 	var body: some Scene {
 		WindowGroup {
 			ContentView()
 		}
-		.modelContainer(for: [Item.self], inMemory: false, isAutosaveEnabled: true, isUndoEnabled: true) { result in
-			switch result {
-			case let .success(container):
-				break
-			case .failure:
-				break
-			}
+		.modelContainer(sharedModelContainer)
+
+		Settings {
+			SettingsView()
 		}
+		.modelContainer(sharedModelContainer)
 	}
 }

@@ -58,4 +58,37 @@ extension DataManager {
 		}
 		item.text = newText
 	}
+
+	// MARK: - Tags
+
+	@discardableResult
+	static func addTag(with title: String, to context: ModelContext, all: [Tag]) -> PersistentIdentifier {
+		let new = Tag(title: title)
+		for (index, tag) in all.enumerated() {
+			tag.index = index + 1
+		}
+		context.insert(new)
+		return new.id
+	}
+
+	static func moveTags(_ indices: IndexSet, to target: Int, in context: ModelContext, all: [Tag]) {
+		var modificated = all
+		modificated.move(fromOffsets: indices, toOffset: target)
+		try? context.transaction {
+			for (index, item) in modificated.enumerated() {
+				item.index = index
+			}
+		}
+	}
+
+	static func deleteTags(_ ids: Set<PersistentIdentifier>, in context: ModelContext, all: [Tag]) {
+		let filtered = all.filter {
+			ids.contains($0.id)
+		}
+		try? context.transaction {
+			for item in filtered {
+				context.delete(item)
+			}
+		}
+	}
 }
