@@ -88,10 +88,11 @@ struct IconPicker: View {
 		}
 	}
 }
-#endif
+
 
 #Preview {
 	IconPicker { icon in
 
 	}
 }
+#endif

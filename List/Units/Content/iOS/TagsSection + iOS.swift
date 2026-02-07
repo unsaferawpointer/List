@@ -26,28 +26,19 @@ struct TagsSection: View {
 				spacing: 8
 			) {
 				ForEach(tags) { tag in
-					TagView(
-						title: tag.title,
-						foregroundColor: filter.excludedTag.contains(tag.uuid) ? .red : .label,
-						backgroundColor: !filter.includedTag.contains(tag.uuid) || filter.excludedTag.contains(tag.uuid)
-							? .systemFill
-							: .tintColor.withAlphaComponent(0.3),
-						imageName: filter.excludedTag.contains(tag.uuid) ? "xmark.circle" : tag.iconName.imageName ?? "tag",
-						menuItems: buildMenu(for: tag)
-					) {
-						withAnimation {
-							if filter.includedTag.contains(tag.uuid) {
+					TagView(title: tag.title, state: state(for: tag))
+						.contentShape(Rectangle())
+						.onTapGesture(count: 1) {
+							switch (filter.includedTag.contains(tag.uuid), filter.excludedTag.contains(tag.uuid)) {
+							case (true, false):
 								filter.includedTag.remove(tag.uuid)
-							} else {
-								if filter.excludedTag.contains(tag.uuid) {
-									filter.excludedTag.remove(tag.uuid)
-									filter.includedTag.insert(tag.uuid)
-								} else {
-									filter.includedTag.insert(tag.uuid)
-								}
+								filter.excludedTag.insert(tag.uuid)
+							case (false, true):
+								filter.excludedTag.remove(tag.uuid)
+							default:
+								filter.includedTag.insert(tag.uuid)
 							}
 						}
-					}
 				}
 			}
 			.scrollTargetLayout()
@@ -60,6 +51,16 @@ struct TagsSection: View {
 }
 
 extension TagsSection {
+
+	func state(for tag: Tag) -> TagState {
+		if filter.excludedTag.contains(tag.uuid) {
+			return .excluded
+		}
+		if filter.includedTag.contains(tag.uuid) {
+			return .active
+		}
+		return .normal
+	}
 
 	func buildMenu(for tag: Tag) -> [UIAction] {
 		let isExcluded = filter.excludedTag.contains(tag.uuid)

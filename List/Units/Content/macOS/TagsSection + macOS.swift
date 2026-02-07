@@ -27,22 +27,19 @@ struct TagsSection: View {
 		ScrollView(.horizontal) {
 			HStack {
 				ForEach(tags) { tag in
-					TagView(
-						title: tag.title,
-						foregroundColor: excludedTags.contains(tag.uuid) ? .systemRed : .secondaryLabelColor,
-						imageName: excludedTags.contains(tag.uuid) ? "xmark.circle" : tag.iconName.imageName ?? "tag",
-						isOn: includedTags.contains(tag.uuid) || excludedTags.contains(tag.uuid)
-					) {
-						if includedTags.contains(tag.uuid) {
-							includedTags.remove(tag.uuid)
-						} else {
-							includedTags.insert(tag.uuid)
+					TagView(title: tag.title, state: state(for: tag))
+						.contentShape(Rectangle())
+						.onTapGesture(count: 1) {
+							switch (includedTags.contains(tag.uuid), excludedTags.contains(tag.uuid)) {
+							case (true, false):
+								includedTags.remove(tag.uuid)
+								excludedTags.insert(tag.uuid)
+							case (false, true):
+								excludedTags.remove(tag.uuid)
+							default:
+								includedTags.insert(tag.uuid)
+							}
 						}
-						excludedTags.remove(tag.uuid)
-					} onExclude: {
-						excludedTags.insert(tag.uuid)
-						includedTags.remove(tag.uuid)
-					}
 				}
 			}
 			.toggleStyle(.button)
@@ -53,6 +50,16 @@ struct TagsSection: View {
 
 // MARK: - Helpers
 private extension TagsSection {
+
+	func state(for tag: Tag) -> TagState {
+		if excludedTags.contains(tag.uuid) {
+			return .excluded
+		}
+		if includedTags.contains(tag.uuid) {
+			return .active
+		}
+		return .normal
+	}
 
 	func isOn(for tag: Tag) -> Binding<Bool> {
 		return Binding {

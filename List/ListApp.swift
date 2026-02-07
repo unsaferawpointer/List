@@ -31,9 +31,11 @@ struct ListApp: App {
 		}
 		.modelContainer(sharedModelContainer)
 
+		#if os(macOS)
 		Settings {
 			SettingsView()
 		}
 		.modelContainer(sharedModelContainer)
+		#endif
 	}
 }
