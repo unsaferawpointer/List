@@ -18,7 +18,9 @@ struct ContentView {
 
 	@State var selection: Set<PersistentIdentifier> = []
 
-	@Query(sort: [SortDescriptor<Item>.byIndex, .byTimestamp], animation: .default) var items: [Item]
+	@Query var items: [Item]
+
+	@Query var tags: [Tag]
 
 	@State var scrollPosition: PersistentIdentifier?
 }
@@ -68,6 +70,8 @@ extension ContentView: View {
 					proxy.scrollTo(scrollPosition, anchor: .bottom)
 				}
 			}
+			.navigationTitle(TextFactory.makeTitle(filter: filter.wrappedValue, tags: tags))
+			.navigationSubtitle(TextFactory.makeSubtitle(filter: filter.wrappedValue, tags: tags, itemsCount: items.count))
 			.toolbar {
 				ToolbarItem(placement: .primaryAction) {
 					Button("Add", systemImage: "plus") {

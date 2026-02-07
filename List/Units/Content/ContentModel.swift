@@ -60,25 +60,17 @@ extension ContentModel {
 	}
 
 	func navigationTitle(isEditMode: Bool, tags: [Tag], filter: Filter) -> String {
-		let isFiltering = !tags.isEmpty && !filter.includedTag.isEmpty
-		guard !isFiltering else {
-			return String(localized: "Filtered by tags", table: "ContentLocalizable")
+		guard !isEditMode else {
+			return String(localized: "\(selection.count) Selected", table: "ContentLocalizable")
 		}
-		return isEditMode && !selection.isEmpty
-			? String(localized: "\(selection.count) Selected", table: "ContentLocalizable")
-			: String(localized: "All Items", table: "ContentLocalizable")
+		return TextFactory.makeTitle(filter: filter, tags: tags)
 	}
 
 	func navigationSubtitle(isEditMode: Bool, tags: [Tag], items: [Item], filter: Filter) -> String {
-		let isFiltering = !tags.isEmpty && !filter.includedTag.isEmpty
-		guard isFiltering else {
+		guard !isEditMode else {
 			return "\(items.count) Items"
 		}
-		return tags.filter {
-			filter.includedTag.contains($0.uuid)
-		}
-		.map(\.title)
-		.joined(separator: ", ")
+		return TextFactory.makeSubtitle(filter: filter, tags: tags, itemsCount: items.count)
 	}
 }
 
