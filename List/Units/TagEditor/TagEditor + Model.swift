@@ -5,6 +5,7 @@
 //  Created by Anton Cherkasov on 29.12.2025.
 //
 
+#if os(iOS)
 import Foundation
 
 extension TagEditor {
@@ -14,3 +15,4 @@ extension TagEditor {
 		var iconName: IconName
 	}
 }
+#endif

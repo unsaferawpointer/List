@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#if os(iOS)
 struct IconPicker: View {
 
 	@Binding var icon: IconName
@@ -62,8 +63,35 @@ struct IconNameCell: View {
 		.frame(width: 80)
 	}
 }
+#endif
 
+#if os(macOS)
+struct IconPicker: View {
+
+	@State var icons: [IconName] = IconName.allCases
+
+	var onTap: (IconName) -> Void
+
+	// MARK: - Initialization
+
+	init(onTap: @escaping (IconName) -> Void) {
+		self.onTap = onTap
+	}
+
+	var body: some View {
+		ForEach(icons) { icon in
+			Button {
+				onTap(icon)
+			} label: {
+				Label(icon.imageName ?? "None", systemImage: icon.imageName ?? "circle.slash")
+			}
+		}
+	}
+}
+#endif
 
 #Preview {
-	IconPicker(icon: .constant(.star))
+	IconPicker { icon in
+
+	}
 }

@@ -5,6 +5,7 @@
 //  Created by Anton Cherkasov on 29.12.2025.
 //
 
+#if os(iOS)
 import SwiftUI
 
 struct TagEditor {
@@ -75,3 +76,4 @@ extension TagEditor: View {
 
 	}
 }
+#endif

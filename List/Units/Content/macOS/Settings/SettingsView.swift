@@ -86,6 +86,18 @@ private extension SettingsView {
 		}
 		.keyboardShortcut(.return, modifiers: .command)
 		Divider()
+		Menu {
+			IconPicker { icon in
+				return tags.filter { tag in
+					selected.contains(tag.id)
+				}.forEach { tag in
+					tag.iconName = icon
+				}
+			}
+		} label: {
+			Label("Icon", systemImage: "photo")
+		}
+		Divider()
 		Button(role: .destructive) {
 			withAnimation {
 				DataManager.deleteTags(selected, in: modelContext, all: tags)
