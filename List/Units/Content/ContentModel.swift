@@ -85,6 +85,12 @@ extension ContentModel {
 		modelContext.insert(newItem)
 	}
 
+	func selectAll(items: [Item]) {
+		for item in items {
+			selection.insert(item.id)
+		}
+	}
+
 	func editItem(_ item: Item) {
 		presentedItem = item
 	}

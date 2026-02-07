@@ -179,6 +179,13 @@ extension ContentView {
 			}
 			.disabled(editMode == .active)
 		}
+		if editMode == .active {
+			ToolbarItem(placement: .bottomBar) {
+				Button("Select All") {
+					selectAll()
+				}
+			}
+		}
 		ToolbarItem(placement: .bottomBar) {
 			Spacer()
 		}
@@ -237,6 +244,12 @@ extension ContentView {
 					}
 				}
 			}
+		}
+	}
+
+	func selectAll() {
+		withAnimation {
+			model.selectAll(items: items)
 		}
 	}
 
