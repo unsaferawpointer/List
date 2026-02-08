@@ -68,7 +68,8 @@ extension ContentView: View {
 				} else {
 					List(selection: $model.selection) {
 						if !tags.isEmpty && editMode != .active {
-							TagsSection(tags: tags, filter: filter)
+							TagsSection(includedTags: filter.includedTag, excludedTags: filter.excludedTag)
+								.listRowSeparator(.hidden)
 						}
 						Section {
 							FilteredContentView(

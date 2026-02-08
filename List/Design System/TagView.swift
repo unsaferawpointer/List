@@ -11,14 +11,16 @@ struct TagView: View {
 
 	let title: String
 
-	let imageName: String
+	let iconName: IconName
 
 	let state: TagState
 
 	var body: some View {
 		HStack(spacing: 6) {
-			stateIcon
-
+			Image(systemName: systemName)
+				.foregroundStyle(foregroundColor)
+				.font(.footnote)
+				.fontWeight(.semibold)
 			Text(title)
 				.foregroundStyle(foregroundColor)
 				.font(.footnote)
@@ -35,23 +37,18 @@ struct TagView: View {
 	}
 }
 
-// MARK: - Helpers
+// MARK: - Computed Properties
 private extension TagView {
 
-	var stateIcon: some View {
-		Group {
-			switch state {
-			case .active:
-				Image(systemName: "checkmark")
-			case .excluded:
-				Image(systemName: "xmark")
-			case .normal:
-				Image(systemName: imageName)
-			}
+	var systemName: String {
+		switch state {
+		case .normal:
+			iconName.imageName ?? "tag"
+		case .active:
+			"checkmark"
+		case .excluded:
+			"xmark"
 		}
-		.foregroundStyle(foregroundColor)
-		.font(.footnote)
-		.fontWeight(.semibold)
 	}
 
 	var foregroundColor: Color {
@@ -88,11 +85,54 @@ private extension TagView {
 	}
 }
 
-#Preview {
-	TagView(title: "Travel", imageName: "airplane", state: .active)
-		.padding()
-	TagView(title: "Travel", imageName: "airplane", state: .excluded)
-		.padding()
-	TagView(title: "Travel", imageName: "airplane", state: .normal)
-		.padding()
+#Preview("LTR") {
+	VStack {
+		TagView(title: "Travel", iconName: .bolt, state: .normal)
+		TagView(title: "Travel", iconName: .bolt, state: .active)
+		TagView(title: "Travel", iconName: .bolt, state: .excluded)
+	}
+	.padding()
+	.background {
+//		Color(.controlBackgroundColor)
+	}
+	.environment(\.colorScheme, .light)
+	.environment(\.layoutDirection, .leftToRight)
+
+	VStack {
+		TagView(title: "Travel", iconName: .bolt, state: .normal)
+		TagView(title: "Travel", iconName: .bolt, state: .active)
+		TagView(title: "Travel", iconName: .bolt, state: .excluded)
+	}
+	.padding()
+	.background {
+//		Color(.controlBackgroundColor)
+	}
+	.environment(\.colorScheme, .dark)
+	.environment(\.layoutDirection, .leftToRight)
+}
+
+#Preview("RTL") {
+	VStack {
+		TagView(title: "Travel", iconName: .bolt, state: .normal)
+		TagView(title: "Travel", iconName: .bolt, state: .active)
+		TagView(title: "Travel", iconName: .bolt, state: .excluded)
+	}
+	.padding()
+	.background {
+//		Color(.controlBackgroundColor)
+	}
+	.environment(\.colorScheme, .light)
+	.environment(\.layoutDirection, .rightToLeft)
+
+	VStack {
+		TagView(title: "Travel", iconName: .bolt, state: .normal)
+		TagView(title: "Travel", iconName: .bolt, state: .active)
+		TagView(title: "Travel", iconName: .bolt, state: .excluded)
+	}
+	.padding()
+	.background {
+//		Color(.controlBackgroundColor)
+	}
+	.environment(\.colorScheme, .dark)
+	.environment(\.layoutDirection, .rightToLeft)
 }

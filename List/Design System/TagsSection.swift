@@ -1,15 +1,12 @@
 //
-//  TagsSection + macOS.swift
+//  TagsSection.swift
 //  List
 //
-//  Created by Anton Cherkasov on 30.01.2026.
+//  Created by Anton Cherkasov on 08.02.2026.
 //
 
 import SwiftUI
 import SwiftData
-
-#if os(macOS)
-import AppKit
 
 struct TagsSection: View {
 
@@ -27,18 +24,10 @@ struct TagsSection: View {
 		ScrollView(.horizontal) {
 			HStack {
 				ForEach(tags) { tag in
-					TagView(title: tag.title, imageName: tag.iconName.imageName ?? "tag", state: state(for: tag))
+					TagView(title: tag.title, iconName: tag.iconName, state: state(for: tag.uuid))
 						.contentShape(Rectangle())
-						.onTapGesture(count: 1) {
-							switch (includedTags.contains(tag.uuid), excludedTags.contains(tag.uuid)) {
-							case (true, false):
-								includedTags.remove(tag.uuid)
-								excludedTags.insert(tag.uuid)
-							case (false, true):
-								excludedTags.remove(tag.uuid)
-							default:
-								includedTags.insert(tag.uuid)
-							}
+						.onTapGesture {
+							onTap(id: tag.uuid)
 						}
 				}
 			}
@@ -51,24 +40,36 @@ struct TagsSection: View {
 // MARK: - Helpers
 private extension TagsSection {
 
-	func state(for tag: Tag) -> TagState {
-		if excludedTags.contains(tag.uuid) {
+	func onTap(id: UUID) {
+		switch (includedTags.contains(id), excludedTags.contains(id)) {
+		case (true, false):
+			includedTags.remove(id)
+			excludedTags.insert(id)
+		case (false, true):
+			excludedTags.remove(id)
+		default:
+			includedTags.insert(id)
+		}
+	}
+
+	func state(for id: UUID) -> TagState {
+		if excludedTags.contains(id) {
 			return .excluded
 		}
-		if includedTags.contains(tag.uuid) {
+		if includedTags.contains(id) {
 			return .active
 		}
 		return .normal
 	}
 
-	func isOn(for tag: Tag) -> Binding<Bool> {
+	func isOn(for id: UUID) -> Binding<Bool> {
 		return Binding {
-			includedTags.contains(tag.uuid)
+			includedTags.contains(id)
 		} set: { newValue in
 			if newValue {
-				includedTags.insert(tag.uuid)
+				includedTags.insert(id)
 			} else {
-				includedTags.remove(tag.uuid)
+				includedTags.remove(id)
 			}
 		}
 	}
@@ -80,4 +81,3 @@ private extension TagsSection {
 		.padding()
 		.fixedSize()
 }
-#endif
