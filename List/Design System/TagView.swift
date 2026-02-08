@@ -11,6 +11,8 @@ struct TagView: View {
 
 	let title: String
 
+	let imageName: String
+
 	let state: TagState
 
 	var body: some View {
@@ -44,7 +46,7 @@ private extension TagView {
 			case .excluded:
 				Image(systemName: "xmark")
 			case .normal:
-				Image(systemName: "tag")
+				Image(systemName: imageName)
 			}
 		}
 		.foregroundStyle(foregroundColor)
@@ -87,10 +89,10 @@ private extension TagView {
 }
 
 #Preview {
-	TagView(title: "Travel", state: .active)
+	TagView(title: "Travel", imageName: "airplane", state: .active)
 		.padding()
-	TagView(title: "Travel", state: .excluded)
+	TagView(title: "Travel", imageName: "airplane", state: .excluded)
 		.padding()
-	TagView(title: "Travel", state: .normal)
+	TagView(title: "Travel", imageName: "airplane", state: .normal)
 		.padding()
 }

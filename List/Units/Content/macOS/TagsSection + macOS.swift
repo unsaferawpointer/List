@@ -27,7 +27,7 @@ struct TagsSection: View {
 		ScrollView(.horizontal) {
 			HStack {
 				ForEach(tags) { tag in
-					TagView(title: tag.title, state: state(for: tag))
+					TagView(title: tag.title, imageName: tag.iconName.imageName ?? "tag", state: state(for: tag))
 						.contentShape(Rectangle())
 						.onTapGesture(count: 1) {
 							switch (includedTags.contains(tag.uuid), excludedTags.contains(tag.uuid)) {
