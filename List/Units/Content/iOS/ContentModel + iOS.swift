@@ -5,6 +5,7 @@
 //  Created by Anton Cherkasov on 08.01.2026.
 //
 
+#if os(iOS)
 import Foundation
 import SwiftData
 
@@ -22,53 +23,24 @@ final class ContentModel {
 	var selection: Set<PersistentIdentifier> = []
 }
 
-// MARK: - Context Menu Localization
-extension ContentModel {
-
-	func menuItemTitle(id: ElementIdentifier) -> String {
-		switch id {
-		case .edit:
-			String(localized: "Edit...", table: "ContentLocalizable")
-		case .delete:
-			String(localized: "Delete", table: "ContentLocalizable")
-		case .undo:
-			String(localized: "Undo", table: "ContentLocalizable")
-		case .redo:
-			String(localized: "Redo", table: "ContentLocalizable")
-		case .tags:
-			String(localized: "Tags...", table: "ContentLocalizable")
-		case .status:
-			String(localized: "Completed", table: "ContentLocalizable")
-		}
-	}
-}
-
 extension ContentModel {
 
 	func itemEditorTitle(isNew: Bool) -> String {
 		isNew
-			? String(localized: "New Item", table: "ContentLocalizable")
-			: String(localized: "Edit Item", table: "ContentLocalizable")
-	}
-
-	func contentUnavailableMessage() -> String {
-		String(localized: "Tap \"+\" to add your first task.", table: "ContentLocalizable")
-	}
-
-	func contentUnavailableTitle() -> String {
-		String(localized: "No Tasks", table: "ContentLocalizable")
+			? String(localized: "New Item", table: "ContentLocalizable + iOS")
+			: String(localized: "Edit Item", table: "ContentLocalizable + iOS")
 	}
 
 	func navigationTitle(isEditMode: Bool, tags: [Tag], filter: Filter) -> String {
 		guard !isEditMode else {
-			return String(localized: "\(selection.count) Selected", table: "ContentLocalizable")
+			return ContentLocalization.NavigationBar.editModeTitle(selectionCount: selection.count)
 		}
 		return TextFactory.makeTitle(filter: filter, tags: tags)
 	}
 
 	func navigationSubtitle(isEditMode: Bool, tags: [Tag], items: [Item], filter: Filter) -> String {
 		guard !isEditMode else {
-			return "\(items.count) Items"
+			return ContentLocalization.NavigationBar.editModeSubtitle(count: items.count)
 		}
 		return TextFactory.makeSubtitle(filter: filter, tags: tags, itemsCount: items.count)
 	}
@@ -110,3 +82,4 @@ extension ContentModel {
 		return !items.isEmpty
 	}
 }
+#endif

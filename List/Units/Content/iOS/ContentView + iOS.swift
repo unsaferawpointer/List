@@ -11,9 +11,7 @@ import SwiftData
 
 struct ContentView {
 
-	#if os(iOS)
 	@State var editMode: EditMode = .inactive
-	#endif
 
 	@AppStorage("filter") private var filterSettings: Data?
 
@@ -61,9 +59,9 @@ extension ContentView: View {
 			Group {
 				if model.shouldContentUnavailableView(for: items) {
 					ContentUnavailableView(
-						model.contentUnavailableTitle(),
+						ContentLocalization.ContentUnavailable.title,
 						systemImage: "shippingbox",
-						description: Text(model.contentUnavailableMessage())
+						description: Text(ContentLocalization.ContentUnavailable.message)
 					)
 				} else {
 					List(selection: $model.selection) {
@@ -128,24 +126,24 @@ extension ContentView {
 	@ViewBuilder
 	func buildMenu(item: Item) -> some View {
 		Toggle(isOn: item.isOn) {
-			Text(model.menuItemTitle(id: .status))
+			Text(ContentLocalization.Menu.completed)
 		}
 		Divider()
 		Button {
 			model.editItem(item)
 		} label: {
-			Label(model.menuItemTitle(id: .edit), systemImage: "pencil")
+			Label(ContentLocalization.Menu.edit, systemImage: "pencil")
 		}
 		Button {
 			model.showTagsPicker(for: item)
 		} label: {
-			Label(model.menuItemTitle(id: .tags), systemImage: "tag")
+			Label(ContentLocalization.Menu.tags, systemImage: "tag")
 		}
 		Divider()
 		Button(role: .destructive) {
 			deleteItem(item: item)
 		} label: {
-			Label(model.menuItemTitle(id: .delete), systemImage: "trash")
+			Label(ContentLocalization.Menu.delete, systemImage: "trash")
 		}
 	}
 
@@ -160,29 +158,29 @@ extension ContentView {
 				Button {
 					undoManager?.undo()
 				} label: {
-					Label("Undo", systemImage: "arrow.uturn.backward")
+					Label(ContentLocalization.Menu.undo, systemImage: "arrow.uturn.backward")
 				}
 				.disabled(undoManager?.canUndo == false)
 				Button {
 					undoManager?.redo()
 				} label: {
-					Label("Redo", systemImage: "arrow.uturn.forward")
+					Label(ContentLocalization.Menu.redo, systemImage: "arrow.uturn.forward")
 				}
 				.disabled(undoManager?.canRedo == false)
 				Divider()
 				NavigationLink {
 					TagsEditor()
 				} label: {
-					Label("Tags...", systemImage: "tag")
+					Label(ContentLocalization.Menu.tags, systemImage: "tag")
 				}
 			} label: {
-				Label("Common", systemImage: "ellipsis")
+				Label(ContentLocalization.Toolbar.main, systemImage: "ellipsis")
 			}
 			.disabled(editMode == .active)
 		}
 		if editMode == .active {
 			ToolbarItem(placement: .bottomBar) {
-				Button("Select All") {
+				Button(ContentLocalization.Toolbar.selectAll) {
 					selectAll()
 				}
 			}
@@ -197,29 +195,29 @@ extension ContentView {
 						sources: completionSources(for: model.selection, in: items),
 						isOn: \.self
 					) {
-						Text("Completed")
+						Text(ContentLocalization.Menu.completed)
 					}
 					Divider()
 					Button {
 						self.model.isTagPickerPresented = true
 					} label: {
-						Label("Tags...", systemImage: "tag")
+						Label(ContentLocalization.Menu.tags, systemImage: "tag")
 					}
 					Divider()
 					Button(role: .destructive) {
 						deleteSelectedItems()
 					} label: {
-						Label("Delete", systemImage: "trash")
+						Label(ContentLocalization.Menu.delete, systemImage: "trash")
 					}
 				} label: {
-					Label("Edit...", systemImage: "ellipsis")
+					Label(ContentLocalization.Toolbar.main, systemImage: "ellipsis")
 				}
 				.disabled(model.selection.isEmpty)
 			} else {
 				Button {
 					showItemEditor()
 				} label: {
-					Label("Add Item", systemImage: "plus")
+					Label(ContentLocalization.Toolbar.add, systemImage: "plus")
 				}
 			}
 		}

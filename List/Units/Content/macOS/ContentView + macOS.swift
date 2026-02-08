@@ -60,8 +60,6 @@ extension ContentView: View {
 				}
 				.contextMenu(forSelectionType: PersistentIdentifier.self) { selected in
 					buildMenu(for: selected)
-				} primaryAction: { selected in
-
 				}
 				.onChange(of: scrollPosition) { oldValue, newValue in
 					guard oldValue != newValue else {
@@ -99,11 +97,16 @@ private extension ContentView {
 	}
 }
 
+// MARK: - Helpers
 private extension ContentView {
 
 	func addItem() {
 		withAnimation {
-			let id = DataManager.addItem(with: "New Item", to: modelContext, all: items)
+			let id = DataManager.addItem(
+				with: ContentLocalization.defaultItemText,
+				to: modelContext,
+				all: items
+			)
 			withAnimation {
 				scrollPosition = id
 			}
@@ -117,20 +120,20 @@ private extension ContentView {
 	@ViewBuilder
 	func buildMenu(for selected: Set<PersistentIdentifier>) -> some View {
 		Toggle(sources: completionSources(for: selected), isOn: \.self) {
-			Text("Completed")
+			Text(ContentLocalization.Menu.completed)
 		}
 		.keyboardShortcut(.return, modifiers: .command)
 		Divider()
 		Menu {
 			TagsPicker(selected: selected)
 		} label: {
-			Label("Tags...", systemImage: "tag")
+			Label(ContentLocalization.Menu.tags, systemImage: "tag")
 		}
 		Divider()
 		Button(role: .destructive) {
 			DataManager.deleteItems(selected, in: modelContext, all: items)
 		} label: {
-			Label("Delete", systemImage: "trash")
+			Label(ContentLocalization.Menu.delete, systemImage: "trash")
 		}
 		.keyboardShortcut(.delete, modifiers: .command)
 	}

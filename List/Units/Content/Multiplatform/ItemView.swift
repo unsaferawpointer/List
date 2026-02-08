@@ -52,13 +52,13 @@ struct ItemView: View {
 #if os(macOS)
 struct ItemView: View {
 
-	var item: Item
+	private var item: Item
 
-	@FocusState var focus: Bool
+	@FocusState private var focus: Bool
 
-	@State var text: String
+	@State private var text: String
 
-	let onChange: (String) -> Void
+	private let onChange: (String) -> Void
 
 	// MARK: - Initialization
 
@@ -74,7 +74,7 @@ struct ItemView: View {
 				.foregroundStyle(item.isCompleted ? .tertiary : .secondary)
 				.frame(width: 4, height: 4)
 			VStack(alignment: .leading) {
-				TextField("Required", text: $text)
+				TextField(ContentLocalization.itemCellPlaceholder, text: $text)
 					.focused($focus)
 					.foregroundStyle(item.isCompleted ? .secondary : .primary)
 					.lineLimit(2)
@@ -85,13 +85,25 @@ struct ItemView: View {
 					.onChange(of: focus) {
 						onChange(text)
 					}
-				if !(item.tags?.isEmpty == true) {
-					Text(item.tags?.map(\.title).joined(separator: " | ") ?? "")
+				if showSubtitle {
+					Text(subtitle)
 						.font(.caption)
 						.foregroundStyle(.secondary)
 				}
 			}
 		}
+	}
+}
+
+// MARK: - Helpers
+private extension ItemView {
+
+	var showSubtitle: Bool {
+		!(item.tags?.isEmpty == true)
+	}
+
+	var subtitle: String {
+		item.tags?.map(\.title).joined(separator: " | ") ?? ""
 	}
 }
 
