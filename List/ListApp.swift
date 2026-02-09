@@ -10,6 +10,8 @@ import SwiftData
 
 @main
 struct ListApp: App {
+	
+	@AppStorage("onboardingShownForVersion") private var onboardingShownForVersion: String?
 
 	var sharedModelContainer: ModelContainer = {
 		let schema = Schema([
@@ -26,10 +28,41 @@ struct ListApp: App {
 	}()
 
 	var body: some Scene {
-		WindowGroup {
-			ContentView()
+
+		Window("Welcome to List", id: "welcome") {
+			OnboardingView(
+				steps:
+					[
+						OnboardingPage(
+							title: "Built for focus",
+							subtitle: "See only the tasks that matter right now."
+						) {
+							ListMock(showTags: false, focusedRow: 2)
+								.padding()
+						},
+						OnboardingPage(title: "Filter with tags", subtitle: "Choose what to include or exclude") {
+							ListMock(showTags: true, focusedRow: nil)
+								.padding()
+						}
+					]
+			)
+			.onDisappear {
+				onboardingShownForVersion = InfoFacade.currentVersion
+			}
+			.windowMinimizeBehavior(.disabled)
+			.windowResizeBehavior(.disabled)
+			.windowFullScreenBehavior(.disabled)
 		}
-		.modelContainer(sharedModelContainer)
+		.windowStyle(.hiddenTitleBar)
+		.defaultSize(width: 560, height: 680)
+		.defaultLaunchBehavior(onboardingShownForVersion == InfoFacade.currentVersion ? .suppressed : .presented)
+
+		WindowGroup(id: "main") {
+			ContentView()
+				.modelContainer(sharedModelContainer)
+		}
+		.defaultLaunchBehavior(onboardingShownForVersion == InfoFacade.currentVersion ? .presented : .suppressed)
+
 
 		#if os(macOS)
 		Settings {
@@ -39,3 +72,4 @@ struct ListApp: App {
 		#endif
 	}
 }
+
