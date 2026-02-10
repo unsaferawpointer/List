@@ -13,10 +13,21 @@ struct ListMock {
 
 	// MARK: - Initialization
 
+	init(model: Model) {
+		self.model = model
+	}
+
 	init(showTags: Bool = true, focusedRow: Int? = nil) {
-		self.model = Model(
-			showTags: showTags,
-			rows: ListMockFactory.rows(count: 6, focusedRow: focusedRow)
+		self.init(
+			model: Model(
+				showTags: showTags,
+				rows: ListMockFactory.rows(count: 6).enumerated().map { index, row in
+					guard let focusedRow, index == focusedRow else {
+						return row
+					}
+					return RowMock(id: row.id, title: row.title, subtitle: row.subtitle, isShimmering: false)
+				}
+			)
 		)
 	}
 }
@@ -39,26 +50,26 @@ extension ListMock: View {
 				.padding(.vertical, 8)
 			}
 			ForEach(model.rows) { row in
-				let isFocused = !row.isShimmering
-
 				HStack(spacing: 12) {
 					Circle()
 						.foregroundStyle(.tertiary)
-						.frame(width: 8, height: 8)
-					VStack(alignment: .leading, spacing: 6) {
-						Text(row.title)
-							.font(.headline)
-							.foregroundStyle(.primary)
-							.redacted(reason: isFocused ? .invalidated : .placeholder)
-						Text(row.subtitle)
-							.font(.subheadline)
-							.foregroundStyle(.secondary)
-							.redacted(reason: isFocused ? .invalidated : .placeholder)
+							.frame(width: 8, height: 8)
+						VStack(alignment: .leading, spacing: 6) {
+							Text(row.title)
+								.font(.headline)
+								.foregroundStyle(.primary)
+								.redacted(reason: row.isFocused ? .invalidated : .placeholder)
+							if row.hasSubtitle {
+								Text(row.subtitle)
+									.font(.subheadline)
+									.foregroundStyle(.secondary)
+									.redacted(reason: row.isFocused ? .invalidated : .placeholder)
+							}
+						}
+						Spacer()
 					}
-					Spacer()
-				}
-				.blur(radius: isFocused ? 0.0 : 0.5)
-				.opacity(isFocused ? 1.0 : 0.5)
+				.blur(radius: row.isFocused ? 0.0 : 0.5)
+				.opacity(row.isFocused ? 1.0 : 0.5)
 				.animation(.spring(response: 0.28, dampingFraction: 0.85), value: model.rows.map(\.isShimmering))
 			}
 		}

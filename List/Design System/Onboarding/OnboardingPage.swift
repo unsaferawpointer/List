@@ -7,46 +7,66 @@
 
 import SwiftUI
 
-struct OnboardingPage: View {
+struct OnboardingPage {
 
-	let title: String
-	let subtitle: String
-
-	let content: AnyView
+	let model: Model
 
 	// MARK: - Initialization
 
-	init<Content: View>(title: String, subtitle: String, @ViewBuilder content: () -> Content) {
-		self.title = title
-		self.subtitle = subtitle
-		self.content = AnyView(content())
+	init(model: Model) {
+		self.model = model
 	}
+}
+
+// MARK: - View
+extension OnboardingPage: View {
 
 	var body: some View {
 		VStack(spacing: 8) {
 			VStack(alignment: .center, spacing: 8) {
-				Text(title)
+				Text(model.title)
 					.font(.largeTitle)
 					.fontWeight(.semibold)
 					.multilineTextAlignment(.center)
 
-				Text(subtitle)
+				Text(model.subtitle)
 					.foregroundColor(.secondary)
 					.multilineTextAlignment(.center)
 			}
 			.frame(maxWidth: .infinity, alignment: .center)
 			.padding(.init(top: 56, leading: 12, bottom: 12, trailing: 12))
-			content
+			ListMock(model: model.listMock)
+				.padding()
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 	}
 }
 
+// MARK: - Nested Data Structs
+extension OnboardingPage {
+
+	struct Model {
+		
+		let title: String
+		let subtitle: String
+		let listMock: ListMock.Model
+
+		// MARK: - Initialization
+
+		init(title: String, subtitle: String, listMock: ListMock.Model) {
+			self.title = title
+			self.subtitle = subtitle
+			self.listMock = listMock
+		}
+	}
+}
+
 #Preview {
 	OnboardingPage(
-		title: "Filter with tags",
-		subtitle: "Choose what to include or exclude"
-	) {
-		ListMock(showTags: true, focusedRow: nil)
-	}
+		model: .init(
+			title: OnboardingTextFactory.Pages.tagsTitle,
+			subtitle: OnboardingTextFactory.Pages.tagsSubtitle,
+			listMock: .init(showTags: true)
+		)
+	)
 }

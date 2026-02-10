@@ -10,7 +10,7 @@ import SwiftData
 
 @main
 struct ListApp: App {
-	
+
 	@AppStorage("onboardingShownForVersion") private var onboardingShownForVersion: String?
 
 	var sharedModelContainer: ModelContainer = {
@@ -29,29 +29,14 @@ struct ListApp: App {
 
 	var body: some Scene {
 
-		Window("Welcome to List", id: "welcome") {
-			OnboardingView(
-				steps:
-					[
-						OnboardingPage(
-							title: "Built for focus",
-							subtitle: "See only the tasks that matter right now."
-						) {
-							ListMock(showTags: false, focusedRow: 2)
-								.padding()
-						},
-						OnboardingPage(title: "Filter with tags", subtitle: "Choose what to include or exclude") {
-							ListMock(showTags: true, focusedRow: nil)
-								.padding()
-						}
-					]
-			)
-			.onDisappear {
-				onboardingShownForVersion = InfoFacade.currentVersion
-			}
-			.windowMinimizeBehavior(.disabled)
-			.windowResizeBehavior(.disabled)
-			.windowFullScreenBehavior(.disabled)
+		Window("List", id: "welcome") {
+			OnboardingView(model: OnboardingModelFactory.makeModel())
+				.onDisappear {
+					onboardingShownForVersion = InfoFacade.currentVersion
+				}
+				.windowMinimizeBehavior(.disabled)
+				.windowResizeBehavior(.disabled)
+				.windowFullScreenBehavior(.disabled)
 		}
 		.windowStyle(.hiddenTitleBar)
 		.defaultSize(width: 560, height: 680)

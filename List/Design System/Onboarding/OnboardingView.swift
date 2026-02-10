@@ -7,24 +7,28 @@
 
 import SwiftUI
 
-struct OnboardingView: View {
+struct OnboardingView {
 
 	@Environment(\.dismiss) var dismiss
 	@Environment(\.openWindow) private var openWindow
 
-	private let steps: [OnboardingPage]
+	private let model: Model
 
 	@State private var state: OnboardingState
 
-	init(steps: [OnboardingPage]) {
-		self.steps = steps
-		self._state = State(initialValue: OnboardingState(count: steps.count))
+	init(model: Model) {
+		self.model = model
+		self._state = State(initialValue: OnboardingState(count: model.steps.count))
 	}
+}
+
+// MARK: - View
+extension OnboardingView: View {
 
 	var body: some View {
 		VStack(spacing: 0) {
 			ZStack {
-				steps[state.index]
+				OnboardingPage(model: model.steps[state.index])
 					.transition(state.transition)
 					.animation(.easeInOut(duration: 0.35), value: state.index)
 			}
@@ -33,17 +37,34 @@ struct OnboardingView: View {
 			controls
 		}
 	}
+}
 
-	private var controls: some View {
+// MARK: - Model
+extension OnboardingView {
+
+	struct Model {
+
+		let steps: [OnboardingPage.Model]
+
+		init(steps: [OnboardingPage.Model]) {
+			self.steps = steps
+		}
+	}
+}
+
+// MARK: - Helpers
+private extension OnboardingView {
+
+	var controls: some View {
 		HStack {
-			Button("Back") {
+			Button(OnboardingTextFactory.Controls.back) {
 				goBack()
 			}
 			.controlSize(.extraLarge)
 			.keyboardShortcut(.cancelAction)
 			.disabled(state.index == 0)
 			Spacer()
-			Button(state.index == steps.count - 1 ? "Done" : "Continue") {
+			Button(state.index == model.steps.count - 1 ? OnboardingTextFactory.Controls.done : OnboardingTextFactory.Controls.continue) {
 				goForward()
 			}
 			.controlSize(.extraLarge)
@@ -51,10 +72,6 @@ struct OnboardingView: View {
 		}
 		.padding()
 	}
-}
-
-// MARK: - Helpers
-private extension OnboardingView {
 
 	func goForward() {
 		if !state.goForward() {
@@ -71,25 +88,10 @@ private extension OnboardingView {
 // MARK: - Preview Data
 fileprivate enum OnboardingViewPreviewData {
 
-	static let steps: [OnboardingPage] =
-	[
-		OnboardingPage(
-			title: "Welcome to List",
-			subtitle: "No date, no priorities — only focus"
-		) {
-			ListMock(showTags: false, focusedRow: 2)
-				.padding()
-		},
-		OnboardingPage(
-			title: "Filter with tags",
-			subtitle: "Choose what to include or exclude"
-		) {
-			ListMock(showTags: true, focusedRow: nil)
-				.padding()
-		}
-	]
+	static let model: OnboardingView.Model =
+		OnboardingModelFactory.makeModel(focusedRow: 2)
 }
 
 #Preview {
-	OnboardingView(steps: OnboardingViewPreviewData.steps)
+	OnboardingView(model: OnboardingViewPreviewData.model)
 }

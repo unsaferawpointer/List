@@ -1,0 +1,226 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "onboarding.controls.back" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
+          }
+        }
+      }
+    },
+    "onboarding.controls.continue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        }
+      }
+    },
+    "onboarding.controls.done" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Started"
+          }
+        }
+      }
+    },
+    "onboarding.mock.tag.archive" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archive"
+          }
+        }
+      }
+    },
+    "onboarding.mock.tag.ideas" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ideas"
+          }
+        }
+      }
+    },
+    "onboarding.mock.tag.sport" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sport"
+          }
+        }
+      }
+    },
+    "onboarding.mock.tag.travel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Travel"
+          }
+        }
+      }
+    },
+    "onboarding.mock.tag.work" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Work"
+          }
+        }
+      }
+    },
+    "onboarding.mock.task.buyGroceries" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buy groceries"
+          }
+        }
+      }
+    },
+    "onboarding.mock.task.callMom" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Call mom"
+          }
+        }
+      }
+    },
+    "onboarding.mock.task.generic.title %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task %lld"
+          }
+        }
+      }
+    },
+    "onboarding.mock.task.payBills" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay bills"
+          }
+        }
+      }
+    },
+    "onboarding.mock.task.planWeekendTrip" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plan weekend trip"
+          }
+        }
+      }
+    },
+    "onboarding.mock.task.read20Pages" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read 20 pages"
+          }
+        }
+      }
+    },
+    "onboarding.mock.task.takeOutTrash" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Take out the trash"
+          }
+        }
+      }
+    },
+    "onboarding.mock.task.workOut" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Work out"
+          }
+        }
+      }
+    },
+    "onboarding.page.focus.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See only the tasks that matter right now."
+          }
+        }
+      }
+    },
+    "onboarding.page.focus.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Built for focus"
+          }
+        }
+      }
+    },
+    "onboarding.page.tags.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose what to include or exclude"
+          }
+        }
+      }
+    },
+    "onboarding.page.tags.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter with tags"
+          }
+        }
+      }
+    },
+    "onboarding.page.welcome.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A simple, calm space for your tasks."
+          }
+        }
+      }
+    },
+    "onboarding.page.welcome.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to List"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}

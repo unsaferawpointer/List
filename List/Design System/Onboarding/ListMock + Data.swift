@@ -20,14 +20,14 @@ extension ListMock {
 
 		// MARK: - Initialization
 
-		init(
-			showTags: Bool = true,
-			tags: [TagMock] = ListMockFactory.tags(),
-			rows: [RowMock] = ListMockFactory.rows(count: 6, focusedRow: nil)
-		) {
-			self.showTags = showTags
-			self.tags = tags
-			self.rows = rows
+			init(
+				showTags: Bool = true,
+				tags: [TagMock] = ListMockFactory.tags(),
+				rows: [RowMock] = ListMockFactory.rows(count: 6)
+			) {
+				self.showTags = showTags
+				self.tags = tags
+				self.rows = rows
 		}
 	}
 
@@ -58,6 +58,14 @@ extension ListMock {
 			self.title = title
 			self.subtitle = subtitle
 			self.isShimmering = isShimmering
+		}
+
+		var isFocused: Bool {
+			!isShimmering
+		}
+
+		var hasSubtitle: Bool {
+			!subtitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
 		}
 	}
 }
