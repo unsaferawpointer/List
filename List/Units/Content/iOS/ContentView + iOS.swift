@@ -13,7 +13,7 @@ struct ContentView {
 
 	@State var editMode: EditMode = .inactive
 
-	@AppStorage("filter") private var filterSettings: Data?
+	@SceneStorage("filter") private var filterSettings: Data?
 
 	@Environment(\.modelContext) var modelContext
 	@Environment(\.undoManager) private var undoManager

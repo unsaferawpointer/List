@@ -14,7 +14,7 @@ struct ContentView {
 
 	@Environment(\.modelContext) var modelContext
 
-	@AppStorage("filter") private var filterSettings: Data?
+	@SceneStorage("filter") private var filterSettings: Data?
 
 	@State var selection: Set<PersistentIdentifier> = []
 
