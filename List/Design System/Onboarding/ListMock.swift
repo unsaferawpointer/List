@@ -36,7 +36,7 @@ struct ListMock {
 extension ListMock: View {
 
 	var body: some View {
-		VStack(spacing: 14) {
+		List {
 			if model.showTags {
 				ScrollView(.horizontal) {
 					HStack {
@@ -71,9 +71,11 @@ extension ListMock: View {
 				.blur(radius: row.isFocused ? 0.0 : 0.5)
 				.opacity(row.isFocused ? 1.0 : 0.5)
 				.animation(.spring(response: 0.28, dampingFraction: 0.85), value: model.rows.map(\.isShimmering))
+				.listRowSeparator(.hidden)
 			}
 		}
-		.padding(24)
+		.listStyle(.inset)
+		.scrollIndicators(.hidden)
 		.overlay(
 			RoundedRectangle(cornerRadius: 12)
 				.stroke(Color.gray.opacity(0.2), lineWidth: 1)

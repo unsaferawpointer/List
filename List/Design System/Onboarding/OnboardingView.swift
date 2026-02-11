@@ -10,14 +10,16 @@ import SwiftUI
 struct OnboardingView {
 
 	@Environment(\.dismiss) var dismiss
-	@Environment(\.openWindow) private var openWindow
 
 	private let model: Model
 
 	@State private var state: OnboardingState
 
-	init(model: Model) {
+	let onFinish: () -> Void
+
+	init(model: Model, onFinish: @escaping () -> Void = { }) {
 		self.model = model
+		self.onFinish = onFinish
 		self._state = State(initialValue: OnboardingState(count: model.steps.count))
 	}
 }
@@ -75,8 +77,8 @@ private extension OnboardingView {
 
 	func goForward() {
 		if !state.goForward() {
-			openWindow(id: "main")
 			dismiss()
+			onFinish()
 		}
 	}
 

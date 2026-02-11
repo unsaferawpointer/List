@@ -27,26 +27,49 @@ struct ListApp: App {
 		}
 	}()
 
+	#if os(iOS)
+	@State private var isOnboardingShown: Bool = false
+	#elseif os(macOS)
+	@Environment(\.openWindow) private var openWindow
+	#endif
+
 	var body: some Scene {
 
+		#if os(macOS)
 		Window("List", id: "welcome") {
-			OnboardingView(model: OnboardingModelFactory.makeModel())
-				.onDisappear {
-					onboardingShownForVersion = InfoFacade.currentVersion
-				}
-				.windowMinimizeBehavior(.disabled)
-				.windowResizeBehavior(.disabled)
-				.windowFullScreenBehavior(.disabled)
+			OnboardingView(model: OnboardingModelFactory.makeModel()) {
+				openWindow(id: "main")
+			}
+			.onDisappear {
+				onboardingShownForVersion = InfoFacade.currentVersion
+			}
+			.windowMinimizeBehavior(.disabled)
+			.windowResizeBehavior(.disabled)
+			.windowFullScreenBehavior(.disabled)
 		}
 		.windowStyle(.hiddenTitleBar)
 		.defaultSize(width: 560, height: 680)
 		.defaultLaunchBehavior(onboardingShownForVersion == InfoFacade.currentVersion ? .suppressed : .presented)
+		#endif
 
 		WindowGroup(id: "main") {
 			ContentView()
 				.modelContainer(sharedModelContainer)
+				#if os(iOS)
+				.onAppear {
+					isOnboardingShown = onboardingShownForVersion != InfoFacade.currentVersion
+				}
+				.fullScreenCover(isPresented: $isOnboardingShown) {
+					OnboardingView(model: OnboardingModelFactory.makeModel()) {
+						onboardingShownForVersion = InfoFacade.currentVersion
+					}
+					.interactiveDismissDisabled()
+				}
+				#endif
 		}
+		#if os(macOS)
 		.defaultLaunchBehavior(onboardingShownForVersion == InfoFacade.currentVersion ? .presented : .suppressed)
+		#endif
 
 
 		#if os(macOS)
