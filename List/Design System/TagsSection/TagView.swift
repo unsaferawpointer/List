@@ -11,7 +11,7 @@ struct TagView: View {
 
 	let title: String
 
-	let iconName: IconName
+	let imageName: String?
 
 	let state: TagState
 
@@ -43,7 +43,7 @@ private extension TagView {
 	var systemName: String {
 		switch state {
 		case .normal:
-			iconName.imageName ?? "tag"
+			imageName ?? "tag"
 		case .active:
 			"checkmark"
 		case .excluded:
@@ -87,52 +87,40 @@ private extension TagView {
 
 #Preview("LTR") {
 	VStack {
-		TagView(title: "Travel", iconName: .bolt, state: .normal)
-		TagView(title: "Travel", iconName: .bolt, state: .active)
-		TagView(title: "Travel", iconName: .bolt, state: .excluded)
+		TagView(title: "Travel", imageName: "bolt", state: .normal)
+		TagView(title: "Travel", imageName: "bolt", state: .active)
+		TagView(title: "Travel", imageName: "bolt", state: .excluded)
 	}
 	.padding()
-	.background {
-//		Color(.controlBackgroundColor)
-	}
 	.environment(\.colorScheme, .light)
 	.environment(\.layoutDirection, .leftToRight)
 
 	VStack {
-		TagView(title: "Travel", iconName: .bolt, state: .normal)
-		TagView(title: "Travel", iconName: .bolt, state: .active)
-		TagView(title: "Travel", iconName: .bolt, state: .excluded)
+		TagView(title: "Travel", imageName: "bolt", state: .normal)
+		TagView(title: "Travel", imageName: "bolt", state: .active)
+		TagView(title: "Travel", imageName: "bolt", state: .excluded)
 	}
 	.padding()
-	.background {
-//		Color(.controlBackgroundColor)
-	}
 	.environment(\.colorScheme, .dark)
 	.environment(\.layoutDirection, .leftToRight)
 }
 
 #Preview("RTL") {
 	VStack {
-		TagView(title: "Travel", iconName: .bolt, state: .normal)
-		TagView(title: "Travel", iconName: .bolt, state: .active)
-		TagView(title: "Travel", iconName: .bolt, state: .excluded)
+		TagView(title: "Travel", imageName: "bolt", state: .normal)
+		TagView(title: "Travel", imageName: "bolt", state: .active)
+		TagView(title: "Travel", imageName: "bolt", state: .excluded)
 	}
 	.padding()
-	.background {
-//		Color(.controlBackgroundColor)
-	}
 	.environment(\.colorScheme, .light)
 	.environment(\.layoutDirection, .rightToLeft)
 
 	VStack {
-		TagView(title: "Travel", iconName: .bolt, state: .normal)
-		TagView(title: "Travel", iconName: .bolt, state: .active)
-		TagView(title: "Travel", iconName: .bolt, state: .excluded)
+		TagView(title: "Travel", imageName: "bolt", state: .normal)
+		TagView(title: "Travel", imageName: "bolt", state: .active)
+		TagView(title: "Travel", imageName: "bolt", state: .excluded)
 	}
 	.padding()
-	.background {
-//		Color(.controlBackgroundColor)
-	}
 	.environment(\.colorScheme, .dark)
 	.environment(\.layoutDirection, .rightToLeft)
 }

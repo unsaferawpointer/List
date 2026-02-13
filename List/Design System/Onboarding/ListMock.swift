@@ -41,7 +41,7 @@ extension ListMock: View {
 				ScrollView(.horizontal) {
 					HStack {
 						ForEach(model.tags) { tag in
-							TagView(title: tag.title, iconName: tag.iconName, state: tag.state)
+							TagView(title: tag.title, imageName: tag.iconName.imageName, state: tag.state)
 						}
 					}
 					.toggleStyle(.button)

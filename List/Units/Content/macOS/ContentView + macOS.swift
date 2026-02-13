@@ -53,7 +53,8 @@ extension ContentView: View {
 				List(selection: $selection) {
 					TagsSection(
 						includedTags: filter.includedTag,
-						excludedTags: filter.excludedTag
+						excludedTags: filter.excludedTag,
+						completionState: filter.completionState
 					)
 					.padding(.init(top: 0, leading: 8, bottom: 8, trailing: 8))
 					ItemsSection(filter: filter.wrappedValue)

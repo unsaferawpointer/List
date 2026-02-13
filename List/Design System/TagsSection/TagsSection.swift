@@ -20,11 +20,23 @@ struct TagsSection: View {
 
 	@Binding var excludedTags: Set<UUID>
 
+	@Binding var completionState: Filter.CompletionState
+
 	var body: some View {
 		ScrollView(.horizontal) {
 			HStack {
+				TagView(
+					title: String(localized: "tags-section.completed", table: "TagsSectionLocalizable"),
+					imageName: "checkmark",
+					state: completionState.state
+				)
+				.contentShape(Rectangle())
+				.onTapGesture {
+					onTapCompleted()
+				}
+				Divider()
 				ForEach(tags) { tag in
-					TagView(title: tag.title, iconName: tag.iconName, state: state(for: tag.uuid))
+					TagView(title: tag.title, imageName: tag.iconName.imageName, state: state(for: tag.uuid))
 						.contentShape(Rectangle())
 						.onTapGesture {
 							onTap(id: tag.uuid)
@@ -39,6 +51,17 @@ struct TagsSection: View {
 
 // MARK: - Helpers
 private extension TagsSection {
+
+	func onTapCompleted() {
+		switch completionState {
+		case .any:
+			completionState = .include
+		case .include:
+			completionState = .exlude
+		case .exlude:
+			completionState = .any
+		}
+	}
 
 	func onTap(id: UUID) {
 		switch (includedTags.contains(id), excludedTags.contains(id)) {
@@ -75,8 +98,22 @@ private extension TagsSection {
 	}
 }
 
+private extension Filter.CompletionState {
+
+	var state: TagState {
+		switch self {
+		case .exlude:
+			return .excluded
+		case .include:
+			return .active
+		case .any:
+			return .normal
+		}
+	}
+}
+
 #Preview(traits: .sizeThatFitsLayout) {
-	TagsSection(includedTags: .constant([]), excludedTags: .constant([]))
+	TagsSection(includedTags: .constant([]), excludedTags: .constant([]), completionState: .constant(.any))
 		.modelContainer(PreviewContainer.previewContainer)
 		.padding()
 		.fixedSize()
