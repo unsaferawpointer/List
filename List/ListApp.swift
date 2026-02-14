@@ -13,19 +13,7 @@ struct ListApp: App {
 
 	@AppStorage("onboardingShownForVersion") private var onboardingShownForVersion: String?
 
-	var sharedModelContainer: ModelContainer = {
-		let schema = Schema([
-			Item.self,
-			Tag.self
-		])
-		let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-		do {
-			return try ModelContainer(for: schema, configurations: [modelConfiguration])
-		} catch {
-			fatalError("Could not create ModelContainer: \(error)")
-		}
-	}()
+	let sharedContainer = CommonStorage.shared.container
 
 	#if os(iOS)
 	@State private var isOnboardingShown: Bool = false
@@ -54,7 +42,7 @@ struct ListApp: App {
 
 		WindowGroup(id: "main") {
 			ContentView()
-				.modelContainer(sharedModelContainer)
+				.modelContainer(sharedContainer)
 				#if os(iOS)
 				.onAppear {
 					isOnboardingShown = onboardingShownForVersion != InfoFacade.currentVersion
@@ -76,7 +64,7 @@ struct ListApp: App {
 		Settings {
 			SettingsView()
 		}
-		.modelContainer(sharedModelContainer)
+		.modelContainer(sharedContainer)
 		#endif
 	}
 }
