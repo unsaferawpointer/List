@@ -39,7 +39,7 @@ extension ListMock: View {
 		List {
 			if model.showTags {
 				ScrollView(.horizontal) {
-					HStack {
+					LazyHStack {
 						ForEach(model.tags) { tag in
 							TagView(title: tag.title, imageName: tag.iconName.imageName, state: tag.state)
 						}

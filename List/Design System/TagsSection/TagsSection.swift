@@ -24,7 +24,7 @@ struct TagsSection: View {
 
 	var body: some View {
 		ScrollView(.horizontal) {
-			HStack {
+			LazyHStack {
 				TagView(
 					title: String(localized: "tags-section.completed", table: "TagsSectionLocalizable"),
 					imageName: "checkmark",
@@ -40,7 +40,7 @@ struct TagsSection: View {
 						.contentShape(Rectangle())
 						.onTapGesture {
 							onTap(id: tag.uuid)
-						}
+					}
 				}
 			}
 			.toggleStyle(.button)
