@@ -39,62 +39,22 @@
         }
       }
     },
-    "items.excluded.count.subtitle %lld" : {
+    "navigation.title.completed" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Excluding: %lld"
+            "value" : "Completed"
           }
         }
       }
     },
-    "items.excluded.subtitle %@" : {
+    "navigation.title.incomplete" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Excluding: %@"
-          }
-        }
-      }
-    },
-    "items.included.count.subtitle %lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Including: %lld"
-          }
-        }
-      }
-    },
-    "items.included.excluded.count.subtitle %lld %lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Including: %1$lld, Excluding: %2$lld"
-          }
-        }
-      }
-    },
-    "items.included.excluded.subtitle %@ %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Including: %1$@, Excluding: %2$@"
-          }
-        }
-      }
-    },
-    "items.included.subtitle %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Including: %@"
+            "value" : "Incomplete"
           }
         }
       }

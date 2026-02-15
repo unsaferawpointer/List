@@ -23,6 +23,8 @@ struct ContentView {
 	@Query var tags: [Tag]
 
 	@State var scrollPosition: PersistentIdentifier?
+
+	let textFactory = TextFactory()
 }
 
 // MARK: - Computed Properties
@@ -41,6 +43,13 @@ extension ContentView {
 			}
 			filterSettings = data
 		}
+	}
+}
+
+extension ContentView {
+
+	var filteredItemsCount: Int {
+		items.filter { (try? filter.wrappedValue.predicate.evaluate($0)) ?? false }.count
 	}
 }
 
@@ -69,8 +78,8 @@ extension ContentView: View {
 					proxy.scrollTo(scrollPosition, anchor: .bottom)
 				}
 			}
-			.navigationTitle(TextFactory.makeTitle(filter: filter.wrappedValue, tags: tags))
-			.navigationSubtitle(TextFactory.makeSubtitle(filter: filter.wrappedValue, tags: tags, itemsCount: items.count))
+			.navigationTitle(textFactory.makeTitle(filter: filter.wrappedValue, tags: tags))
+			.navigationSubtitle(textFactory.makeSubtitle(filter: filter.wrappedValue, tags: tags, itemsCount: filteredItemsCount))
 			.toolbar {
 				ToolbarItem(placement: .primaryAction) {
 					Button("Add", systemImage: "plus") {

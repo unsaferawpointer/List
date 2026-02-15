@@ -7,11 +7,50 @@
 
 import Foundation
 
-final class TextFactory { }
+final class TextFactory {
+
+	let localizationService: TextFactoryLocalizable
+
+	// MARK: - Initialization
+
+	init(localizationService: TextFactoryLocalizable = TextFactory.LocalizationFactory()) {
+		self.localizationService = localizationService
+	}
+}
 
 extension TextFactory {
 
-	static func makeTitle(filter: Filter, tags: [Tag]) -> String {
+	func makeTitle(filter: Filter, tags: [Tag]) -> String {
+
+		let condition = condition(filter: filter, tags: tags)
+
+		switch condition {
+		case .all:
+			return localizationService.emptyFilterTitle
+		case .completed:
+			return localizationService.navigationTitleCompleted
+		case .incomplete:
+			return localizationService.navigationTitleIncomplete
+		case let .singleTag(tag):
+			return tag.title
+		default:
+			return localizationService.navigationTitleDefault
+		}
+	}
+
+	func makeSubtitle(filter: Filter, tags: [Tag], itemsCount: Int) -> String {
+		return localizationService.navigationSubtitle(for: itemsCount)
+	}
+}
+
+// MARK: - Helpers
+private extension TextFactory {
+
+	func condition(filter: Filter, tags: [Tag]) -> Condition {
+
+		guard !filter.isEmpty else {
+			return .all
+		}
 
 		let excludedTags = tags.filter {
 			filter.excludedTag.contains($0.uuid)
@@ -19,44 +58,33 @@ extension TextFactory {
 		let includedTags = tags.filter {
 			filter.includedTag.contains($0.uuid)
 		}
-		return switch (includedTags.isEmpty, excludedTags.isEmpty) {
-		case (true, true):
-			String(localized: "empty-filter-title", table: "CommonLocalizable")
+
+		switch (includedTags.count, excludedTags.count, filter.completionState) {
+		case (0, 0, .any):
+			return .all
+		case (0, 0, .include):
+			return .completed
+		case (0, 0, .exlude):
+			return .incomplete
+		case (1, 0, .any):
+			guard let tag = includedTags.first else {
+				fatalError()
+			}
+			return .singleTag(tag)
 		default:
-			String(localized: "not-empty-filter-title", table: "CommonLocalizable")
+			return .other
 		}
 	}
+}
 
-	static func makeSubtitle(filter: Filter, tags: [Tag], itemsCount: Int) -> String {
+// MARK: - Nested Data Structs
+private extension TextFactory {
 
-		let excludedTags = tags.filter {
-			filter.excludedTag.contains($0.uuid) && $0.isHidden == false
-		}
-		let includedTags = tags.filter {
-			filter.includedTag.contains($0.uuid) && $0.isHidden == false
-		}
-
-		let totalCount = includedTags.count + excludedTags.count
-		let overLimit = totalCount > 4
-
-		let includedTitles = includedTags.map(\.title).joined(separator: ", ")
-		let excludedTitles = excludedTags.map(\.title).joined(separator: ", ")
-
-		return switch (includedTags.isEmpty, excludedTags.isEmpty) {
-		case (true, true):
-			String(localized: "items.count.subtitle \(itemsCount)", table: "CommonLocalizable")
-		case (true, false):
-			overLimit
-				? String(localized: "items.excluded.count.subtitle \(excludedTags.count)", table: "CommonLocalizable")
-				: String(localized: "items.excluded.subtitle \(excludedTitles)", table: "CommonLocalizable")
-		case (false, true):
-			overLimit
-				? String(localized: "items.included.count.subtitle \(includedTags.count)", table: "CommonLocalizable")
-				: String(localized: "items.included.subtitle \(includedTitles)", table: "CommonLocalizable")
-		case (false, false):
-			overLimit
-				? String(localized: "items.included.excluded.count.subtitle \(includedTags.count) \(excludedTags.count)", table: "CommonLocalizable")
-				: String(localized: "items.included.excluded.subtitle \(includedTitles) \(excludedTitles)", table: "CommonLocalizable")
-		}
+	enum Condition {
+		case all
+		case completed
+		case incomplete
+		case singleTag(_ tag: Tag)
+		case other
 	}
 }

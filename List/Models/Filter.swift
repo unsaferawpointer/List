@@ -45,7 +45,7 @@ extension Filter {
 extension Filter {
 
 	var isEmpty: Bool {
-		includedTag.isEmpty && excludedTag.isEmpty
+		includedTag.isEmpty && excludedTag.isEmpty && completionState == .any
 	}
 
 	var predicate: Predicate<Item> {

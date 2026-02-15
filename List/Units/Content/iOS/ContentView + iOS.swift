@@ -51,6 +51,13 @@ extension ContentView {
 	}
 }
 
+extension ContentView {
+
+	var filteredItems: [Item] {
+		items.filter { (try? filter.wrappedValue.predicate.evaluate($0)) ?? false }
+	}
+}
+
 // MARK: - View
 extension ContentView: View {
 
@@ -93,7 +100,7 @@ extension ContentView: View {
 				model.navigationTitle(isEditMode: editMode == .active, tags: tags, filter: filter.wrappedValue)
 			)
 			.navigationSubtitle(
-				model.navigationSubtitle(isEditMode: editMode == .active, tags: tags, items: items, filter: filter.wrappedValue)
+				model.navigationSubtitle(isEditMode: editMode == .active, tags: tags, items: filteredItems, filter: filter.wrappedValue)
 			)
 			.sheet(isPresented: $model.isItemEditorPresented) {
 				ItemDetails(title: model.itemEditorTitle(isNew: true), text: "") { newText in
