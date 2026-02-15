@@ -34,6 +34,7 @@ struct TagView: View {
 			Capsule()
 				.strokeBorder(borderColor, lineWidth: 0.5)
 		)
+		.padding(2)
 	}
 }
 
