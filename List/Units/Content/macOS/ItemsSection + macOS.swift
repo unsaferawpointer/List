@@ -15,14 +15,17 @@ struct ItemsSection {
 
 	@Query private var items: [Item]
 
+	let onMove: (Set<PersistentIdentifier>, Destination<PersistentIdentifier>) -> Void
+
 	// MARK: - Initialization
 
-	init(filter: Filter) {
+	init(filter: Filter, onMove: @escaping (Set<PersistentIdentifier>, Destination<PersistentIdentifier>) -> Void = { _, _ in }) {
 		self._items = Query(
 			filter: filter.predicate,
 			sort: [.byIndex, .byTimestamp],
 			animation: .default
 		)
+		self.onMove = onMove
 	}
 }
 
@@ -38,6 +41,17 @@ extension ItemsSection: View {
 			}
 			.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
 			.listRowSeparator(.hidden)
+		}
+		.onMove { indices, target in
+			let ids = indices.map {
+				items[$0].id
+			}
+			let destination: Destination<PersistentIdentifier> = if target == items.count {
+				.after(id: items[target - 1].id)
+			} else {
+				.before(id: items[target].id)
+			}
+			onMove(Set(ids), destination)
 		}
 	}
 }

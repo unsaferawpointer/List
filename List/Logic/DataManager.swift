@@ -51,6 +51,32 @@ extension DataManager {
 		}
 	}
 
+	static func moveItems(_ ids: Set<PersistentIdentifier>, to target: Destination<PersistentIdentifier>, in context: ModelContext, all: [Item]) {
+		guard let targetIndex = all.firstIndex(where: { $0.id == target.id }) else {
+			return
+		}
+
+		var cache: [PersistentIdentifier: Int] = [:]
+		for (index, item) in all.enumerated() {
+			cache[item.id] = index
+		}
+
+		var indices = IndexSet()
+		ids.forEach {
+			guard let index = cache[$0] else {
+				return
+			}
+			indices.insert(index)
+		}
+
+		switch target {
+		case .before:
+			moveItems(indices, to: targetIndex, in: context, all: all)
+		case .after:
+			moveItems(indices, to: targetIndex + 1, in: context, all: all)
+		}
+	}
+
 	static func updateItem(_ item: Item, with newText: String, in context: ModelContext) {
 		guard !newText.isEmpty else {
 			context.delete(item)

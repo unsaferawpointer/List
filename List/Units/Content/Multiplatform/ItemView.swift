@@ -85,6 +85,9 @@ struct ItemView: View {
 					.onChange(of: focus) {
 						onChange(text)
 					}
+					.onChange(of: item.text) { oldValue, newValue in
+						text = newValue
+					}
 				if showSubtitle {
 					Text(subtitle)
 						.font(.caption)

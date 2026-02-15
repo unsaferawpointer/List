@@ -18,7 +18,7 @@ struct ContentView {
 
 	@State var selection: Set<PersistentIdentifier> = []
 
-	@Query var items: [Item]
+	@Query(sort: [SortDescriptor<Item>.byIndex, .byTimestamp]) var items: [Item]
 
 	@Query var tags: [Tag]
 
@@ -66,7 +66,11 @@ extension ContentView: View {
 						completionState: filter.completionState
 					)
 					.padding(.init(top: 0, leading: 8, bottom: 8, trailing: 8))
-					ItemsSection(filter: filter.wrappedValue)
+					ItemsSection(filter: filter.wrappedValue) { ids, destination in
+						withAnimation {
+							DataManager.moveItems(ids, to: destination, in: modelContext, all: items)
+						}
+					}
 				}
 				.contextMenu(forSelectionType: PersistentIdentifier.self) { selected in
 					buildMenu(for: selected)
