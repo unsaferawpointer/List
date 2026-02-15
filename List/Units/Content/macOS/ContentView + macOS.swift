@@ -32,10 +32,14 @@ extension ContentView {
 
 	var filter: Binding<Filter> {
 		Binding {
-			guard let data = filterSettings else {
+			guard let data = filterSettings, let result = try? JSONDecoder().decode(Filter.self, from: data) else {
 				return Filter()
 			}
-			return (try? JSONDecoder().decode(Filter.self, from: data)) ?? Filter()
+			return Filter(
+				completionState: result.completionState,
+				includedTag: result.includedTag.intersection(tags.map(\.uuid)),
+				excludedTag: result.excludedTag.intersection(tags.map(\.uuid))
+			)
 		} set: { newValue in
 			guard let data = try? JSONEncoder().encode(newValue) else {
 				filterSettings = nil
