@@ -96,6 +96,9 @@ extension TagsPicker: View {
 #elseif os(macOS)
 struct TagsPicker {
 
+	@Environment(\.openSettings) private var openSettings
+	@AppStorage("selected-settings-tab") private var selectedSettingsTab = SettingsTab.tags
+
 	@Environment(\.modelContext) private var modelContext
 
 	@Query private var tags: [Tag]
@@ -117,6 +120,15 @@ extension TagsPicker: View {
 			Toggle(sources: sources(for: tag), isOn: \.self) {
 				Label(tag.title, systemImage: tag.iconName.imageName ?? "tag")
 			}
+		}
+		if !tags.isEmpty {
+			Divider()
+		}
+		Button {
+			selectedSettingsTab = .tags
+			openSettings()
+		} label: {
+			Text("Create New...")
 		}
 	}
 }

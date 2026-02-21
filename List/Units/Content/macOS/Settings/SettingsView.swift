@@ -11,6 +11,8 @@ import SwiftData
 
 struct SettingsView: View {
 
+	@AppStorage("selected-settings-tab") private var selectedSettingsTab = SettingsTab.tags
+
 	@Environment(\.modelContext) var modelContext
 
 	@Query(sort: [SortDescriptor<Tag>.byIndex, .byTimestamp], animation: .default) var tags: [Tag]
@@ -20,8 +22,8 @@ struct SettingsView: View {
 	@State var selection: Set<PersistentIdentifier> = []
 
 	var body: some View {
-		TabView {
-			Tab("Tags", systemImage: "tag") {
+		TabView(selection: $selectedSettingsTab) {
+			Tab("Tags", systemImage: "tag", value: SettingsTab.tags) {
 				VStack(spacing: 0) {
 					List(selection: $selection) {
 						ForEach(tags) { tag in
@@ -56,6 +58,7 @@ struct SettingsView: View {
 					.padding()
 				}
 			}
+			.tabPlacement(.pinned)
 		}
 	}
 }
