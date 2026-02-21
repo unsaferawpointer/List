@@ -21,6 +21,8 @@ final class ContentModel {
 	var isTagPickerPresented: Bool = false
 
 	var selection: Set<PersistentIdentifier> = []
+
+	let textFactory = TextFactory()
 }
 
 extension ContentModel {
@@ -35,14 +37,14 @@ extension ContentModel {
 		guard !isEditMode else {
 			return ContentLocalization.NavigationBar.editModeTitle(selectionCount: selection.count)
 		}
-		return TextFactory.makeTitle(filter: filter, tags: tags)
+		return textFactory.makeTitle(filter: filter, tags: tags)
 	}
 
 	func navigationSubtitle(isEditMode: Bool, tags: [Tag], items: [Item], filter: Filter) -> String {
 		guard !isEditMode else {
 			return ContentLocalization.NavigationBar.editModeSubtitle(count: items.count)
 		}
-		return TextFactory.makeSubtitle(filter: filter, tags: tags, itemsCount: items.count)
+		return textFactory.makeSubtitle(filter: filter, tags: tags, itemsCount: items.count)
 	}
 }
 
