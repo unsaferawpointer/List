@@ -26,7 +26,10 @@ struct TagsSection: View {
 		ScrollView(.horizontal) {
 			LazyHStack {
 				TagView(
-					title: String(localized: "tags-section.completed", table: "TagsSectionLocalizable"),
+					title: String(
+						localized: "tags-section.completed",
+						table: "TagsSectionLocalizable"
+					),
 					imageName: "checkmark",
 					state: completionState.state
 				)
@@ -34,7 +37,9 @@ struct TagsSection: View {
 				.onTapGesture {
 					onTapCompleted()
 				}
-				Divider()
+				if !tags.isEmpty {
+					Divider()
+				}
 				ForEach(tags) { tag in
 					TagView(title: tag.title, imageName: tag.iconName.imageName, state: state(for: tag.uuid))
 						.contentShape(Rectangle())
