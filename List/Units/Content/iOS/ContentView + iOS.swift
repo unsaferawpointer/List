@@ -64,40 +64,41 @@ extension ContentView: View {
 	var body: some View {
 		NavigationStack {
 			Group {
-				if model.shouldContentUnavailableView(for: items) {
-					ContentUnavailableView(
-						ContentLocalization.ContentUnavailable.title,
-						systemImage: "shippingbox",
-						description: Text(ContentLocalization.ContentUnavailable.message)
-					)
-				} else {
-					List(selection: $model.selection) {
-						if !tags.isEmpty && editMode != .active {
-							TagsSection(
-								includedTags: filter.includedTag,
-								excludedTags: filter.excludedTag,
-								completionState: filter.completionState
-							)
-								.listRowSeparator(.hidden)
-						}
-						Section {
-							ItemsSection(filter: filter.wrappedValue) { item in
-								ItemView(item: item)
-							} onMove: { ids, destination in
-								withAnimation {
-									DataManager.moveItems(
-										ids,
-										to: destination,
-										in: modelContext,
-										all: items
-									)
-								}
+				List(selection: $model.selection) {
+					if !tags.isEmpty && editMode != .active {
+						TagsSection(
+							includedTags: filter.includedTag,
+							excludedTags: filter.excludedTag,
+							completionState: filter.completionState
+						)
+							.listRowSeparator(.hidden)
+					}
+					Section {
+						ItemsSection(filter: filter.wrappedValue) { item in
+							ItemView(item: item)
+						} onMove: { ids, destination in
+							withAnimation {
+								DataManager.moveItems(
+									ids,
+									to: destination,
+									in: modelContext,
+									all: items
+								)
 							}
 						}
 					}
-					.listStyle(.inset)
-					.contextMenu(forSelectionType: PersistentIdentifier.self) { selected in
-						buildMenu(for: selected)
+				}
+				.listStyle(.inset)
+				.contextMenu(forSelectionType: PersistentIdentifier.self) { selected in
+					buildMenu(for: selected)
+				}
+				.overlay {
+					if model.shouldContentUnavailableView(for: items) {
+						ContentUnavailableView(
+							ContentLocalization.ContentUnavailable.title,
+							systemImage: "shippingbox",
+							description: Text(ContentLocalization.ContentUnavailable.message)
+						)
 					}
 				}
 			}

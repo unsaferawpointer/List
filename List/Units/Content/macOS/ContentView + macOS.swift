@@ -87,6 +87,16 @@ extension ContentView: View {
 				.contextMenu(forSelectionType: PersistentIdentifier.self) { selected in
 					buildMenu(for: selected)
 				}
+				.overlay {
+					if items.isEmpty {
+						ContentUnavailableView(
+							ContentLocalization.UnavailableContent.title,
+							systemImage: "shippingbox",
+							description: Text(ContentLocalization.UnavailableContent.message)
+						)
+						.safeAreaPadding(.init(top: 34, leading: 0, bottom: 0, trailing: 0))
+					}
+				}
 				.onChange(of: scrollPosition) { oldValue, newValue in
 					guard oldValue != newValue else {
 						return

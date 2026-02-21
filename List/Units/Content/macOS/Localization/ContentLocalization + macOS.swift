@@ -30,6 +30,15 @@ struct ContentLocalization {
 		}
 	}
 
+	struct UnavailableContent {
+		static var title: String {
+			String(localized: "unavailable-content-empty-title", table: "ContentLocalizable + macOS")
+		}
+		static var message: String {
+			String(localized: "unavailable-content-empty-message", table: "ContentLocalizable + macOS")
+		}
+	}
+
 	struct Toolbar {
 		static var add: String {
 			String(localized: "toolbar.item.add", table: "ContentLocalizable + macOS")
