@@ -81,19 +81,24 @@ extension ContentView: View {
 								.listRowSeparator(.hidden)
 						}
 						Section {
-							FilteredContentView(
-								filter: filter.wrappedValue,
-								editMode: editMode,
-								moveDisabled: filter.wrappedValue.isEmpty
-							) { item in
-								buildMenu(item: item)
-							}
-							.onMove { indices, target in
-								moveItems(with: indices, to: target)
+							ItemsSection(filter: filter.wrappedValue) { item in
+								ItemView(item: item)
+							} onMove: { ids, destination in
+								withAnimation {
+									DataManager.moveItems(
+										ids,
+										to: destination,
+										in: modelContext,
+										all: items
+									)
+								}
 							}
 						}
 					}
 					.listStyle(.inset)
+					.contextMenu(forSelectionType: PersistentIdentifier.self) { selected in
+						buildMenu(for: selected)
+					}
 				}
 			}
 			.navigationTitle(
@@ -131,28 +136,55 @@ extension ContentView: View {
 	}
 }
 
+// MARK: - Binding
+private extension ContentView {
+
+	func completionSources(for selected: Set<PersistentIdentifier>) -> [Binding<Bool>] {
+		return items.filter { item in
+			selected.contains(item.id)
+		}.map { item in
+			Binding {
+				item.isCompleted
+			} set: { newValue in
+				item.isCompleted = newValue
+			}
+		}
+	}
+}
+
 // MARK: - Builders
 extension ContentView {
 
 	@ViewBuilder
-	func buildMenu(item: Item) -> some View {
-		Toggle(isOn: item.isOn) {
+	func buildMenu(for selected: Set<PersistentIdentifier>) -> some View {
+		Toggle(sources: completionSources(for: selected), isOn: \.self) {
 			Text(ContentLocalization.Menu.completed)
 		}
+		.keyboardShortcut(.return, modifiers: .command)
 		Divider()
-		Button {
-			model.editItem(item)
-		} label: {
-			Label(ContentLocalization.Menu.edit, systemImage: "pencil")
+		if selected.count == 1 {
+			Button {
+				guard let item = items.first(where: { selected.contains($0.id) }) else {
+					return
+				}
+				model.editItem(item)
+			} label: {
+				Label(ContentLocalization.Menu.edit, systemImage: "pencil")
+			}
+			Button {
+				guard let item = items.first(where: { selected.contains($0.id) }) else {
+					return
+				}
+				model.showTagsPicker(for: item)
+			} label: {
+				Label(ContentLocalization.Menu.tags, systemImage: "tag")
+			}
+			Divider()
 		}
-		Button {
-			model.showTagsPicker(for: item)
-		} label: {
-			Label(ContentLocalization.Menu.tags, systemImage: "tag")
-		}
-		Divider()
 		Button(role: .destructive) {
-			deleteItem(item: item)
+			withAnimation {
+				DataManager.deleteItems(selected, in: modelContext, all: items)
+			}
 		} label: {
 			Label(ContentLocalization.Menu.delete, systemImage: "trash")
 		}
@@ -290,18 +322,6 @@ extension ContentView {
 			)
 			model.selection.removeAll()
 			editMode = .inactive
-		}
-	}
-
-	func deleteItem(item: Item) {
-		withAnimation {
-			DataManager.deleteItem(item, in: modelContext)
-		}
-	}
-
-	func moveItems(with indices: IndexSet, to target: Int) {
-		withAnimation {
-			DataManager.moveItems(indices, to: target, in: modelContext, all: items)
 		}
 	}
 }

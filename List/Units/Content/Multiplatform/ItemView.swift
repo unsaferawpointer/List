@@ -10,13 +10,13 @@ import SwiftUI
 #if os(iOS)
 struct ItemView: View {
 
-	let isEditing: Bool
+	@Environment(\.editMode) private var editMode
 
 	var item: Item
 
 	var body: some View {
 		HStack(spacing: 16) {
-			if !isEditing {
+			if editMode?.wrappedValue != .active {
 				Circle()
 					.foregroundStyle(item.isCompleted ? .secondary : .primary)
 					.frame(width: 4, height: 4)
@@ -37,15 +37,16 @@ struct ItemView: View {
 }
 
 #Preview(traits: .sizeThatFitsLayout) {
-	ItemView(isEditing: false, item: .init(text: "Default Item"))
+	ItemView(item: .init(text: "Default Item"))
 		.frame(minWidth: 320, alignment: .leading)
 		.padding()
-	ItemView(isEditing: false, item: .init(text: "Completed Item", rawStatus: Status.done.rawValue))
+	ItemView(item: .init(text: "Completed Item", rawStatus: Status.done.rawValue))
 		.frame(minWidth: 320, alignment: .leading)
 		.padding()
-	ItemView(isEditing: true, item: .init(text: "Editing Item"))
+	ItemView(item: .init(text: "Editing Item"))
 		.frame(minWidth: 320, alignment: .leading)
 		.padding()
+		.environment(\.editMode, .constant(.active))
 }
 #endif
 

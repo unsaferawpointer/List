@@ -8,8 +8,7 @@
 import SwiftUI
 import SwiftData
 
-#if os(macOS)
-struct ItemsSection {
+struct ItemsSection<Row: View> {
 
 	@Environment(\.modelContext) var modelContext
 
@@ -17,14 +16,21 @@ struct ItemsSection {
 
 	let onMove: (Set<PersistentIdentifier>, Destination<PersistentIdentifier>) -> Void
 
+	let rowContent: (Item) -> Row
+
 	// MARK: - Initialization
 
-	init(filter: Filter, onMove: @escaping (Set<PersistentIdentifier>, Destination<PersistentIdentifier>) -> Void = { _, _ in }) {
+	init(
+		filter: Filter,
+		@ViewBuilder rowContent: @escaping (Item) -> Row,
+		onMove: @escaping (Set<PersistentIdentifier>, Destination<PersistentIdentifier>) -> Void
+	) {
 		self._items = Query(
 			filter: filter.predicate,
 			sort: [.byIndex, .byTimestamp],
 			animation: .default
 		)
+		self.rowContent = rowContent
 		self.onMove = onMove
 	}
 }
@@ -34,13 +40,7 @@ extension ItemsSection: View {
 
 	var body: some View {
 		ForEach(items) { item in
-			ItemView(item: item) { text in
-				withAnimation {
-					DataManager.updateItem(item, with: text, in: modelContext)
-				}
-			}
-			.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
-			.listRowSeparator(.hidden)
+			rowContent(item)
 		}
 		.onMove { indices, target in
 			let ids = indices.map {
@@ -57,7 +57,9 @@ extension ItemsSection: View {
 }
 
 #Preview {
-	ItemsSection(filter: Filter())
-}
+	ItemsSection(filter: Filter()) { item in
+		Text(item.text)
+	} onMove: { _, _ in
 
-#endif
+	}
+}

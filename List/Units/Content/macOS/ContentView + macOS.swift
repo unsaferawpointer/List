@@ -70,7 +70,15 @@ extension ContentView: View {
 						completionState: filter.completionState
 					)
 					.padding(.init(top: 0, leading: 8, bottom: 8, trailing: 8))
-					ItemsSection(filter: filter.wrappedValue) { ids, destination in
+					ItemsSection(filter: filter.wrappedValue) { item in
+						ItemView(item: item) { text in
+							withAnimation {
+								DataManager.updateItem(item, with: text, in: modelContext)
+							}
+						}
+						.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
+						.listRowSeparator(.hidden)
+					} onMove: { ids, destination in
 						withAnimation {
 							DataManager.moveItems(ids, to: destination, in: modelContext, all: items)
 						}
