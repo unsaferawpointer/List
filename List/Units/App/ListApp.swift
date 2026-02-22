@@ -57,6 +57,9 @@ struct ListApp: App {
 				}
 				#endif
 		}
+		.commands {
+			EditorCommands()
+		}
 		#if os(macOS)
 		.defaultLaunchBehavior(onboardingShownForVersion == InfoFacade.currentVersion ? .presented : .suppressed)
 		#endif
@@ -70,4 +73,3 @@ struct ListApp: App {
 		#endif
 	}
 }
-

@@ -63,14 +63,17 @@ extension ContentView: View {
 	var body: some View {
 		NavigationStack {
 			ScrollViewReader { proxy in
-				List(selection: $selection) {
-					TagsSection(
-						includedTags: filter.includedTag,
-						excludedTags: filter.excludedTag,
-						completionState: filter.completionState
-					)
+			List(selection: $selection) {
+				TagsSection(
+					includedTags: filter.includedTag,
+					excludedTags: filter.excludedTag,
+					completionState: filter.completionState
+				)
 					.padding(.init(top: 0, leading: 8, bottom: 8, trailing: 8))
-					ItemsSection(filter: filter.wrappedValue) { item in
+					ItemsSection(
+						filter: filter.wrappedValue,
+						selection: $selection
+					) { item in
 						ItemView(item: item) { text in
 							withAnimation {
 								DataManager.updateItem(item, with: text, in: modelContext)
@@ -104,6 +107,10 @@ extension ContentView: View {
 					proxy.scrollTo(scrollPosition, anchor: .bottom)
 				}
 			}
+			.onDeleteCommand {
+				deleteSelectedItems()
+			}
+			.deleteDisabled(selection.isEmpty)
 			.navigationTitle(textFactory.makeTitle(filter: filter.wrappedValue, tags: tags))
 			.navigationSubtitle(textFactory.makeSubtitle(filter: filter.wrappedValue, tags: tags, itemsCount: filteredItemsCount))
 			.toolbar {
@@ -113,6 +120,23 @@ extension ContentView: View {
 					}
 				}
 			}
+			.focusedValue(
+				\.deleteAction,
+				 ButtonAction<DeleteAction>(
+					title: ContentLocalization.Menu.delete,
+					isEnabled: !selection.isEmpty
+				 ) {
+					 deleteSelectedItems()
+				 }
+			)
+			.focusedValue(
+				\.completionAction,
+				 ToggleAction(
+					title: ContentLocalization.Menu.completed,
+					isEnabled: !selection.isEmpty,
+					source: completionSources(for: selection)
+				 )
+			)
 		}
 	}
 }
@@ -148,6 +172,13 @@ private extension ContentView {
 			}
 		}
 	}
+
+	func deleteSelectedItems() {
+		withAnimation {
+			DataManager.deleteItems(selection, in: modelContext, all: items)
+			selection.removeAll()
+		}
+	}
 }
 
 // MARK: - Builders
@@ -174,4 +205,5 @@ private extension ContentView {
 		.keyboardShortcut(.delete, modifiers: .command)
 	}
 }
+
 #endif

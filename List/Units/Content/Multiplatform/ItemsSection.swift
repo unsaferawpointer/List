@@ -14,6 +14,8 @@ struct ItemsSection<Row: View> {
 
 	@Query private var items: [Item]
 
+	@Binding var selection: Set<PersistentIdentifier>
+
 	let onMove: (Set<PersistentIdentifier>, Destination<PersistentIdentifier>) -> Void
 
 	let rowContent: (Item) -> Row
@@ -22,9 +24,11 @@ struct ItemsSection<Row: View> {
 
 	init(
 		filter: Filter,
+		selection: Binding<Set<PersistentIdentifier>>,
 		@ViewBuilder rowContent: @escaping (Item) -> Row,
 		onMove: @escaping (Set<PersistentIdentifier>, Destination<PersistentIdentifier>) -> Void
 	) {
+		self._selection = selection
 		self._items = Query(
 			filter: filter.predicate,
 			sort: [.byIndex, .byTimestamp],
@@ -53,11 +57,18 @@ extension ItemsSection: View {
 			}
 			onMove(Set(ids), destination)
 		}
+		.onChange(of: items) { _, newValue in
+			let availableIds = Set(items.map(\.id))
+			if selection.isSubset(of: availableIds) {
+				return
+			}
+			selection = selection.intersection(availableIds)
+		}
 	}
 }
 
 #Preview {
-	ItemsSection(filter: Filter()) { item in
+	ItemsSection(filter: Filter(), selection: .constant([])) { item in
 		Text(item.text)
 	} onMove: { _, _ in
 

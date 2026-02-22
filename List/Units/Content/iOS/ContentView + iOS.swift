@@ -74,7 +74,10 @@ extension ContentView: View {
 							.listRowSeparator(.hidden)
 					}
 					Section {
-						ItemsSection(filter: filter.wrappedValue) { item in
+						ItemsSection(
+							filter: filter.wrappedValue,
+							selection: $model.selection
+						) { item in
 							ItemView(item: item)
 						} onMove: { ids, destination in
 							withAnimation {
@@ -88,6 +91,7 @@ extension ContentView: View {
 						}
 					}
 				}
+				.deleteDisabled(model.selection.isEmpty)
 				.listStyle(.inset)
 				.contextMenu(forSelectionType: PersistentIdentifier.self) { selected in
 					buildMenu(for: selected)
@@ -132,6 +136,23 @@ extension ContentView: View {
 			.toolbar {
 				buildToolbar()
 			}
+			.focusedValue(
+				\.deleteAction,
+				 ButtonAction<DeleteAction>(
+					title: ContentLocalization.Menu.delete,
+					isEnabled: !model.selection.isEmpty
+				 ) {
+					 deleteSelectedItems()
+				 }
+			)
+			.focusedValue(
+				\.completionAction,
+				 ToggleAction(
+					title: ContentLocalization.Menu.completed,
+					isEnabled: !model.selection.isEmpty,
+					source: completionSources(for: model.selection)
+				 )
+			)
 			.environment(\.editMode, $editMode)
 		}
 	}
@@ -323,6 +344,23 @@ extension ContentView {
 			)
 			model.selection.removeAll()
 			editMode = .inactive
+		}
+	}
+
+	func completedStateForSelection() -> Bool {
+		let selectedItems = items.filter { item in
+			model.selection.contains(item.id)
+		}
+		return !selectedItems.isEmpty && selectedItems.allSatisfy(\.isCompleted)
+	}
+
+	func setCompletedForSelection(_ isCompleted: Bool) {
+		withAnimation {
+			items.filter { item in
+				model.selection.contains(item.id)
+			}.forEach { item in
+				item.isCompleted = isCompleted
+			}
 		}
 	}
 }
