@@ -13,10 +13,6 @@ struct SettingsView: View {
 
 	@AppStorage("selected-settings-tab") private var selectedSettingsTab = SettingsTab.tags
 
-	@Environment(\.modelContext) var modelContext
-
-	@Query(sort: [SortDescriptor<Tag>.byIndex, .byTimestamp], animation: .default) var tags: [Tag]
-
 	// MARK: - Internal State
 
 	@State var selection: Set<PersistentIdentifier> = []
@@ -24,110 +20,9 @@ struct SettingsView: View {
 	var body: some View {
 		TabView(selection: $selectedSettingsTab) {
 			Tab("Tags", systemImage: "tag", value: SettingsTab.tags) {
-				VStack(spacing: 0) {
-					List(selection: $selection) {
-						ForEach(tags) { tag in
-							HStack {
-								Image(systemName: tag.iconName.imageName ?? "tag")
-									.foregroundStyle(tag.isHidden ? .secondary : .primary)
-								TextField("Required", text: .init(get: {
-									tag.title
-								}, set: { newValue in
-									tag.title = newValue
-								}))
-								.foregroundStyle(tag.isHidden ? .secondary : .primary)
-							}
-						}
-						.onMove { indices, target in
-							DataManager.moveTags(indices, to: target, in: modelContext, all: tags)
-						}
-					}
-					.listStyle(.inset(alternatesRowBackgrounds: true))
-					.contextMenu(forSelectionType: PersistentIdentifier.self) { selected in
-						buildMenu(for: selected)
-					}
-					Divider()
-					HStack {
-						Button {
-							addTag()
-						} label: {
-							Image(systemName: "plus")
-						}
-						Spacer()
-					}
-					.padding()
-				}
+				TagsEditor()
 			}
 			.tabPlacement(.pinned)
-		}
-	}
-}
-
-// MARK: - Binding
-private extension SettingsView {
-
-	func hiddenSources(for selected: Set<PersistentIdentifier>) -> [Binding<Bool>] {
-		return tags.filter { tag in
-			selected.contains(tag.id)
-		}.map { item in
-			Binding {
-				item.isHidden
-			} set: { newValue in
-				item.isHidden = newValue
-			}
-		}
-	}
-}
-
-// MARK: - Builders
-private extension SettingsView {
-
-	@ViewBuilder
-	func buildMenu(for selected: Set<PersistentIdentifier>) -> some View {
-		Toggle(sources: hiddenSources(for: selected), isOn: \.self) {
-			Text("Hidden")
-		}
-		.keyboardShortcut(.return, modifiers: .command)
-		Divider()
-		Menu {
-			IconPicker { icon in
-				return tags.filter { tag in
-					selected.contains(tag.id)
-				}.forEach { tag in
-					tag.iconName = icon
-				}
-			}
-		} label: {
-			Label("Icon", systemImage: "photo")
-		}
-		Divider()
-		Button(role: .destructive) {
-			withAnimation {
-				DataManager.deleteTags(selected, in: modelContext, all: tags)
-			}
-		} label: {
-			Label("Delete", systemImage: "trash")
-		}
-		.keyboardShortcut(.delete, modifiers: .command)
-	}
-}
-
-// MARK: - Helpers
-private extension SettingsView {
-
-	func addTag() {
-		withAnimation {
-			_ = DataManager.addTag(with: "New Tag", to: modelContext, all: tags)
-		}
-	}
-
-	func setVisibility(selected: Set<PersistentIdentifier>, newValue: Bool) {
-		withAnimation {
-			tags.filter {
-				selected.contains($0.id)
-			}.forEach {
-				$0.isHidden = newValue
-			}
 		}
 	}
 }
