@@ -360,7 +360,13 @@ extension ContentView {
 
 	func addItem(with text: String) {
 		withAnimation {
-			_ = DataManager.addItem(with: text, to: modelContext, all: items)
+			_ = DataManager.addItem(
+				with: text,
+				filter: filter.wrappedValue,
+				to: modelContext,
+				all: items,
+				allTags: tags
+			)
 		}
 	}
 

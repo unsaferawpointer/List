@@ -124,8 +124,10 @@ private extension ContentView {
 		withAnimation {
 			let id = DataManager.addItem(
 				with: ContentLocalization.defaultItemText,
+				filter: filter.wrappedValue,
 				to: modelContext,
-				all: items
+				all: items,
+				allTags: tags
 			)
 			withAnimation {
 				scrollPosition = id

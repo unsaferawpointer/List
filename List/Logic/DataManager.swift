@@ -17,8 +17,9 @@ final class DataManager {
 extension DataManager {
 
 	@discardableResult
-	static func addItem(with text: String, to context: ModelContext, all: [Item]) -> PersistentIdentifier {
+	static func addItem(with text: String, filter: Filter, to context: ModelContext, all: [Item], allTags: [Tag]) -> PersistentIdentifier {
 		let new = Item(text: text)
+		update(items: [new], with: filter, allTags: allTags)
 		for (index, item) in all.enumerated() {
 			item.index = index + 1
 		}
@@ -115,6 +116,27 @@ extension DataManager {
 			for item in filtered {
 				context.delete(item)
 			}
+		}
+	}
+}
+
+// MARK: - Helpers
+private extension DataManager {
+
+	static func update(items: [Item], with filter: Filter, allTags: [Tag]) {
+		let includedTags = allTags.filter {
+			filter.includedTag.contains($0.uuid)
+		}
+		for item in items {
+			switch filter.completionState {
+			case .include:
+				item.isCompleted = true
+			case .exlude:
+				item.isCompleted = false
+			case .any:
+				break
+			}
+			item.tags?.append(contentsOf: includedTags)
 		}
 	}
 }
