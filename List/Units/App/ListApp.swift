@@ -13,9 +13,9 @@ struct ListApp: App {
 
 	@AppStorage("onboardingShownForVersion") private var onboardingShownForVersion: String?
 
-//	let sharedContainer = CommonStorage.shared.container
+	let sharedContainer = CommonStorage.shared.container
 
-	let sharedContainer = PreviewContainer.previewContainer
+//	let sharedContainer = PreviewContainer.previewContainer
 
 	#if os(iOS)
 	@State private var isOnboardingShown: Bool = false
