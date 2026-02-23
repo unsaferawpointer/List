@@ -89,12 +89,13 @@ extension ContentView: View {
 					buildMenu(for: selected)
 				}
 				.overlay {
-					if model.shouldContentUnavailableView(for: items) {
+					if filteredItems.count == 0 {
 						ContentUnavailableView(
-							ContentLocalization.ContentUnavailable.title,
-							systemImage: "shippingbox",
-							description: Text(ContentLocalization.ContentUnavailable.message)
+							makeUnavailableText(allCount: items.count, filteredCount: filteredItems.count),
+							systemImage: unavailableIcon(allCount: items.count, filteredCount: filteredItems.count),
+							description: Text(makeUnavailableMessage(allCount: items.count, filteredCount: filteredItems.count))
 						)
+						.safeAreaPadding(.init(top: 34, leading: 0, bottom: 0, trailing: 0))
 					}
 				}
 			}
@@ -244,7 +245,7 @@ extension ContentView {
 					isFilterSheetPresented = true
 				} label: {
 					Label(
-						"ContentLocalization.Toolbar.filter",
+						FilterLocalization.NavigationBar.title,
 						systemImage: filterToolbarIconName(for: filter.wrappedValue)
 					)
 				}
@@ -322,6 +323,33 @@ extension ContentView {
 				}
 			}
 		}
+	}
+
+	func makeUnavailableText(allCount: Int, filteredCount: Int) -> String {
+		guard allCount > 0 else {
+			return ContentLocalization.ContentUnavailable.title
+		}
+		return filteredCount == 0
+			? ContentLocalization.StrictFilter.text
+			: ""
+	}
+
+	func makeUnavailableMessage(allCount: Int, filteredCount: Int) -> String {
+		guard allCount > 0 else {
+			return ContentLocalization.ContentUnavailable.message
+		}
+		return filteredCount == 0
+			? ContentLocalization.StrictFilter.message
+			: ""
+	}
+
+	func unavailableIcon(allCount: Int, filteredCount: Int) -> String {
+		guard allCount > 0 else {
+			return "shippingbox"
+		}
+		return filteredCount == 0
+			? "line.3.horizontal.decrease.circle"
+			: "shippingbox"
 	}
 
 	func selectAll() {

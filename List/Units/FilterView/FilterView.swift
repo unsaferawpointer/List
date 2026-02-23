@@ -71,7 +71,6 @@ struct FilterView: View {
 				}
 			}
 		}
-		.presentationDetents([.medium, .large])
 	}
 }
 

@@ -76,10 +76,6 @@ extension ContentModel {
 
 extension ContentModel {
 
-	func shouldContentUnavailableView(for items: [Item]) -> Bool {
-		return items.isEmpty
-	}
-
 	func shouldDisplayEditButton(for items: [Item]) -> Bool {
 		return !items.isEmpty
 	}

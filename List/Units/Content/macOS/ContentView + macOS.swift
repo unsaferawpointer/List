@@ -61,75 +61,24 @@ extension ContentView {
 
 // MARK: - View
 extension ContentView: View {
-
 	var body: some View {
+
 		NavigationStack {
-			ScrollViewReader { proxy in
-				List(selection: $selection) {
-					ItemsSection(
-						filter: filter.wrappedValue,
-						selection: $selection
-					) { item in
-						ItemView(item: item) { text in
-							withAnimation {
-								DataManager.updateItem(item, with: text, in: modelContext)
-							}
-						}
-						.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
-						.listRowSeparator(.hidden)
-					} onMove: { ids, destination in
-						withAnimation {
-							DataManager.moveItems(ids, to: destination, in: modelContext, all: items)
-						}
-					}
-				}
-				.contextMenu(forSelectionType: PersistentIdentifier.self) { selected in
-					buildMenu(for: selected)
-				}
+			buildContent()
 				.overlay {
-					if items.isEmpty {
+					if filteredItemsCount == 0 {
 						ContentUnavailableView(
-							ContentLocalization.UnavailableContent.title,
-							systemImage: "shippingbox",
-							description: Text(ContentLocalization.UnavailableContent.message)
+							makeUnavailableText(allCount: items.count, filteredCount: filteredItemsCount),
+							systemImage: unavailableIcon(allCount: items.count, filteredCount: filteredItemsCount),
+							description: Text(makeUnavailableMessage(allCount: items.count, filteredCount: filteredItemsCount))
 						)
 						.safeAreaPadding(.init(top: 34, leading: 0, bottom: 0, trailing: 0))
 					}
 				}
-				.onChange(of: scrollPosition) { oldValue, newValue in
-					guard oldValue != newValue else {
-						return
-					}
-					proxy.scrollTo(scrollPosition, anchor: .bottom)
-				}
-			}
-			.onDeleteCommand {
-				deleteSelectedItems()
-			}
-			.deleteDisabled(selection.isEmpty)
 			.navigationTitle(textFactory.makeTitle(filter: filter.wrappedValue, tags: tags))
 			.navigationSubtitle(textFactory.makeSubtitle(filter: filter.wrappedValue, tags: tags, itemsCount: filteredItemsCount))
 			.toolbar {
-				ToolbarItem(placement: .automatic) {
-					Button {
-						isFilterPopoverPresented.toggle()
-					} label: {
-						Label(
-							ContentLocalization.Toolbar.filterTitle,
-							systemImage: filter.wrappedValue.isEmpty
-								? "line.3.horizontal.decrease.circle"
-								: "line.3.horizontal.decrease.circle.fill"
-						)
-					}
-					.popover(isPresented: $isFilterPopoverPresented, arrowEdge: .bottom) {
-						FilterView(filter: filter)
-					}
-				}
-				ToolbarItem(placement: .primaryAction) {
-					Button("Add", systemImage: "plus") {
-						addItem()
-					}
-				}
+				buildToolbar()
 			}
 			.focusedValue(
 				\.deleteAction,
@@ -190,10 +139,70 @@ private extension ContentView {
 			selection.removeAll()
 		}
 	}
+
+	func makeUnavailableText(allCount: Int, filteredCount: Int) -> String {
+		guard allCount > 0 else {
+			return ContentLocalization.UnavailableContent.title
+		}
+		return filteredCount == 0
+			? ContentLocalization.StrictFilter.text
+			: ""
+	}
+
+	func makeUnavailableMessage(allCount: Int, filteredCount: Int) -> String {
+		guard allCount > 0 else {
+			return ContentLocalization.UnavailableContent.message
+		}
+		return filteredCount == 0
+			? ContentLocalization.StrictFilter.message
+			: ""
+	}
+
+	func unavailableIcon(allCount: Int, filteredCount: Int) -> String {
+		guard allCount > 0 else {
+			return "shippingbox"
+		}
+		return filteredCount == 0
+			? "line.3.horizontal.decrease.circle"
+			: "shippingbox"
+	}
 }
 
 // MARK: - Builders
 private extension ContentView {
+
+	@ViewBuilder
+	func buildContent() -> some View {
+		ScrollViewReader { proxy in
+			List(selection: $selection) {
+				ItemsSection(
+					filter: filter.wrappedValue,
+					selection: $selection
+				) { item in
+					ItemView(item: item) { text in
+						withAnimation {
+							DataManager.updateItem(item, with: text, in: modelContext)
+						}
+					}
+					.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
+					.listRowSeparator(.hidden)
+				} onMove: { ids, destination in
+					withAnimation {
+						DataManager.moveItems(ids, to: destination, in: modelContext, all: items)
+					}
+				}
+			}
+			.contextMenu(forSelectionType: PersistentIdentifier.self) { selected in
+				buildMenu(for: selected)
+			}
+			.onChange(of: scrollPosition) { oldValue, newValue in
+				guard oldValue != newValue else {
+					return
+				}
+				proxy.scrollTo(scrollPosition, anchor: .bottom)
+			}
+		}
+	}
 
 	@ViewBuilder
 	func buildMenu(for selected: Set<PersistentIdentifier>) -> some View {
@@ -214,6 +223,31 @@ private extension ContentView {
 			Label(ContentLocalization.Menu.delete, systemImage: "trash")
 		}
 		.keyboardShortcut(.delete, modifiers: .command)
+	}
+
+	@ToolbarContentBuilder
+	func buildToolbar() -> some ToolbarContent {
+		ToolbarItem(placement: .automatic) {
+				Button {
+					isFilterPopoverPresented = true
+				} label: {
+					Label(
+						FilterLocalization.NavigationBar.title,
+						systemImage: filter.wrappedValue.isEmpty
+							? "line.3.horizontal.decrease.circle"
+							: "line.3.horizontal.decrease.circle.fill"
+					)
+			}
+			.popover(isPresented: $isFilterPopoverPresented, arrowEdge: .bottom) {
+				FilterView(filter: filter)
+					.presentationDetents([.medium, .large])
+			}
+		}
+		ToolbarItem(placement: .primaryAction) {
+			Button("Add", systemImage: "plus") {
+				addItem()
+			}
+		}
 	}
 }
 #endif

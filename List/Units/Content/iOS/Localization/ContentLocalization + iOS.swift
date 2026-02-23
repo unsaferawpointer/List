@@ -52,6 +52,15 @@ struct ContentLocalization {
 		}
 	}
 
+	struct StrictFilter {
+		static var text: String {
+			String(localized: "unavailable.content.strict.filter.text", table: "ContentLocalizable + macOS")
+		}
+		static var message: String {
+			String(localized: "unavailable.content.strict.filter.message", table: "ContentLocalizable + macOS")
+		}
+	}
+
 	struct NavigationBar {
 		static func editModeTitle(selectionCount: Int) -> String {
 			String(localized: "navigation.bar.edit.mode.title count=\(selectionCount)", table: "ContentLocalizable + iOS")

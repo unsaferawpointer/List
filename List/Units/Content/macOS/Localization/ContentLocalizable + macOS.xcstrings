@@ -94,6 +94,26 @@
           }
         }
       }
+    },
+    "unavailable.content.strict.filter.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widen your search to see more."
+          }
+        }
+      }
+    },
+    "unavailable.content.strict.filter.text" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing matches your filters"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"
