@@ -25,6 +25,8 @@ struct ContentView {
 	@State var scrollPosition: PersistentIdentifier?
 
 	let textFactory = TextFactory()
+
+	@State private var isFilterPopoverPresented: Bool = false
 }
 
 // MARK: - Computed Properties
@@ -63,13 +65,7 @@ extension ContentView: View {
 	var body: some View {
 		NavigationStack {
 			ScrollViewReader { proxy in
-			List(selection: $selection) {
-				TagsSection(
-					includedTags: filter.includedTag,
-					excludedTags: filter.excludedTag,
-					completionState: filter.completionState
-				)
-					.padding(.init(top: 0, leading: 8, bottom: 8, trailing: 8))
+				List(selection: $selection) {
 					ItemsSection(
 						filter: filter.wrappedValue,
 						selection: $selection
@@ -114,6 +110,21 @@ extension ContentView: View {
 			.navigationTitle(textFactory.makeTitle(filter: filter.wrappedValue, tags: tags))
 			.navigationSubtitle(textFactory.makeSubtitle(filter: filter.wrappedValue, tags: tags, itemsCount: filteredItemsCount))
 			.toolbar {
+				ToolbarItem(placement: .automatic) {
+					Button {
+						isFilterPopoverPresented.toggle()
+					} label: {
+						Label(
+							ContentLocalization.Toolbar.filterTitle,
+							systemImage: filter.wrappedValue.isEmpty
+								? "line.3.horizontal.decrease.circle"
+								: "line.3.horizontal.decrease.circle.fill"
+						)
+					}
+					.popover(isPresented: $isFilterPopoverPresented, arrowEdge: .bottom) {
+						FilterView(filter: filter)
+					}
+				}
 				ToolbarItem(placement: .primaryAction) {
 					Button("Add", systemImage: "plus") {
 						addItem()
@@ -205,5 +216,4 @@ private extension ContentView {
 		.keyboardShortcut(.delete, modifiers: .command)
 	}
 }
-
 #endif

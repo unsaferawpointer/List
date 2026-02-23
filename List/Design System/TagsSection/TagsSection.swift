@@ -20,7 +20,7 @@ struct TagsSection: View {
 
 	@Binding var excludedTags: Set<UUID>
 
-	@Binding var completionState: Filter.CompletionState
+	@Binding var completionState: Filter.MatchType
 
 	var body: some View {
 		ScrollView(.horizontal) {
@@ -103,7 +103,7 @@ private extension TagsSection {
 	}
 }
 
-private extension Filter.CompletionState {
+private extension Filter.MatchType {
 
 	var state: TagState {
 		switch self {

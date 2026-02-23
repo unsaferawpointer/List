@@ -11,12 +11,12 @@ struct Filter {
 
 	var includedTag: Set<UUID>
 	var excludedTag: Set<UUID>
-	var completionState: CompletionState = .any
+	var completionState: MatchType = .any
 
 	// MARK: - Initialization
 
 	init(
-		completionState: CompletionState = .any,
+		completionState: MatchType = .any,
 		includedTag: Set<UUID> = [],
 		excludedTag: Set<UUID> = []
 	) {
@@ -35,10 +35,49 @@ extension Filter: Hashable { }
 // MARK: - Nested Data Structs
 extension Filter {
 
-	enum CompletionState: Int, Codable {
+	enum MatchType: Int, Codable {
 		case include
 		case exlude
 		case any
+	}
+}
+
+// MARK: - Public Interface
+extension Filter {
+
+	func matchType(for tag: UUID) -> MatchType {
+		if includedTag.contains(tag) {
+			return .include
+		} else if excludedTag.contains(tag) {
+			return .exlude
+		} else {
+			return .any
+		}
+	}
+
+	mutating func nextState(for tag: UUID) {
+		switch matchType(for: tag) {
+		case .any:
+			includedTag.insert(tag)
+			excludedTag.remove(tag)
+		case .include:
+			excludedTag.insert(tag)
+			includedTag.remove(tag)
+		case .exlude:
+			excludedTag.remove(tag)
+			includedTag.remove(tag)
+		}
+	}
+
+	mutating func nextStatus() {
+		switch completionState {
+		case .include:
+			completionState = .exlude
+		case .exlude:
+			completionState = .any
+		case .any:
+			completionState = .include
+		}
 	}
 }
 

@@ -43,6 +43,9 @@ struct ContentLocalization {
 		static var add: String {
 			String(localized: "toolbar.item.add", table: "ContentLocalizable + macOS")
 		}
+		static var filterTitle: String {
+			String(localized: "toolbar.item.filter.title", table: "ContentLocalizable + macOS")
+		}
 	}
 }
 #endif

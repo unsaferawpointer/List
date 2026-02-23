@@ -30,6 +30,8 @@ struct ContentView {
 
 	@State var model = ContentModel()
 
+	@State private var isFilterSheetPresented: Bool = false
+
 }
 
 // MARK: - Computed Properties
@@ -65,29 +67,19 @@ extension ContentView: View {
 		NavigationStack {
 			Group {
 				List(selection: $model.selection) {
-					if !tags.isEmpty && editMode != .active {
-						TagsSection(
-							includedTags: filter.includedTag,
-							excludedTags: filter.excludedTag,
-							completionState: filter.completionState
-						)
-							.listRowSeparator(.hidden)
-					}
-					Section {
-						ItemsSection(
-							filter: filter.wrappedValue,
-							selection: $model.selection
-						) { item in
-							ItemView(item: item)
-						} onMove: { ids, destination in
-							withAnimation {
-								DataManager.moveItems(
-									ids,
-									to: destination,
-									in: modelContext,
-									all: items
-								)
-							}
+					ItemsSection(
+						filter: filter.wrappedValue,
+						selection: $model.selection
+					) { item in
+						ItemView(item: item)
+					} onMove: { ids, destination in
+						withAnimation {
+							DataManager.moveItems(
+								ids,
+								to: destination,
+								in: modelContext,
+								all: items
+							)
 						}
 					}
 				}
@@ -132,6 +124,9 @@ extension ContentView: View {
 			}
 			.sheet(isPresented: $model.isTagPickerPresented) {
 				TagsPicker(items: model.selection) { _ in }
+			}
+			.sheet(isPresented: $isFilterSheetPresented) {
+				FilterView(filter: filter)
 			}
 			.toolbar {
 				buildToolbar()
@@ -243,6 +238,18 @@ extension ContentView {
 			}
 			.disabled(editMode == .active)
 		}
+		ToolbarItem(placement: .bottomBar) {
+			if editMode != .active {
+				Button {
+					isFilterSheetPresented = true
+				} label: {
+					Label(
+						"ContentLocalization.Toolbar.filter",
+						systemImage: filterToolbarIconName(for: filter.wrappedValue)
+					)
+				}
+			}
+		}
 		if editMode == .active {
 			ToolbarItem(placement: .bottomBar) {
 				Button(ContentLocalization.Toolbar.selectAll) {
@@ -292,6 +299,12 @@ extension ContentView {
 
 // MARK: - Helpers
 extension ContentView {
+
+	func filterToolbarIconName(for filter: Filter) -> String {
+		filter.isEmpty
+			? "line.3.horizontal.decrease.circle"
+			: "line.3.horizontal.decrease.circle.fill"
+	}
 
 	func completionSources(for selected: Set<PersistentIdentifier>, in items: [Item]) -> [Binding<Bool>] {
 		return items.filter { item in

@@ -50,6 +50,7 @@ final class PreviewContainer {
 				}
 
 				let newTag = Tag(title: title, index: nextTagIndex)
+				newTag.iconName = IconName.allCases.randomElement() ?? .none
 				nextTagIndex += 1
 				tagsByTitle[title] = newTag
 				context.insert(newTag)
