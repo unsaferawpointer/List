@@ -1,14 +1,36 @@
 {
-  "fill" : {
-    "automatic-gradient" : "srgb:1.00000,1.00000,1.00000,1.00000"
-  },
+  "fill-specializations" : [
+    {
+      "value" : {
+        "automatic-gradient" : "srgb:1.00000,1.00000,1.00000,1.00000"
+      }
+    },
+    {
+      "appearance" : "dark",
+      "value" : {
+        "linear-gradient" : [
+          "srgb:0.26052,0.26052,0.26052,1.00000",
+          "srgb:0.12984,0.12985,0.12984,1.00000"
+        ],
+        "orientation" : {
+          "start" : {
+            "x" : 0.5,
+            "y" : 0
+          },
+          "stop" : {
+            "x" : 0.5,
+            "y" : 0.7
+          }
+        }
+      }
+    }
+  ],
   "groups" : [
     {
-      "blur-material" : null,
-      "hidden" : false,
+      "blend-mode" : "normal",
+      "blur-material" : 0.89,
       "layers" : [
         {
-          "blend-mode" : "normal",
           "fill-specializations" : [
             {
               "value" : {
@@ -18,39 +40,92 @@
             {
               "appearance" : "dark",
               "value" : {
-                "solid" : "srgb:0.47563,0.47565,0.47564,1.00000"
+                "solid" : "srgb:0.75407,0.75409,0.75408,1.00000"
               }
             }
           ],
-          "glass" : true,
-          "hidden" : false,
-          "image-name" : "Icon 2 3.svg",
-          "name" : "lines",
+          "image-name" : "circles 3.svg",
+          "name" : "circles 3",
           "position" : {
-            "scale" : 1,
+            "scale" : 0.9,
             "translation-in-points" : [
-              -4.226934098756519,
-              244.94227942216247
+              7.6095000000000255,
+              63.057878784006334
             ]
           }
         }
       ],
-      "lighting" : "combined",
-      "position" : {
-        "scale" : 1,
-        "translation-in-points" : [
-          0.3664971761927618,
-          -176.04081029792323
-        ]
-      },
+      "lighting" : "individual",
+      "opacity-specializations" : [
+        {
+          "value" : 1
+        },
+        {
+          "appearance" : "dark",
+          "value" : 0.74
+        }
+      ],
       "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 0.5
+        "kind" : "layer-color",
+        "opacity" : 0.51
       },
       "specular" : true,
       "translucency" : {
         "enabled" : true,
-        "value" : 0.1
+        "value" : 0.55
+      }
+    },
+    {
+      "blur-material" : null,
+      "hidden" : false,
+      "layers" : [
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "solid" : "srgb:0.12984,0.12985,0.12984,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "linear-gradient" : [
+                  "srgb:0.92143,0.92145,0.92144,1.00000",
+                  "srgb:0.75407,0.75409,0.75408,1.00000"
+                ],
+                "orientation" : {
+                  "start" : {
+                    "x" : 0.5,
+                    "y" : 0
+                  },
+                  "stop" : {
+                    "x" : 0.5,
+                    "y" : 0.7
+                  }
+                }
+              }
+            }
+          ],
+          "image-name" : "lines.svg",
+          "name" : "lines",
+          "position" : {
+            "scale" : 0.9,
+            "translation-in-points" : [
+              -2.8,
+              63.05787878400628
+            ]
+          }
+        }
+      ],
+      "lighting" : "individual",
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 0.19
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.28
       }
     },
     {
@@ -68,7 +143,7 @@
             {
               "appearance" : "dark",
               "value" : {
-                "solid" : "srgb:0.26052,0.26052,0.26052,1.00000"
+                "solid" : "srgb:0.83742,0.83744,0.83743,1.00000"
               }
             }
           ],
@@ -88,13 +163,13 @@
         ]
       },
       "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 0.5
+        "kind" : "layer-color",
+        "opacity" : 1
       },
       "specular" : true,
       "translucency" : {
         "enabled" : true,
-        "value" : 0.1
+        "value" : 0.4
       }
     }
   ],

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024px" height="1024px">
+  <g transform="matrix(1, 0, 0, 1, -19.85405, -67.813995)">
+    <title>lines</title>
+    <g transform="matrix(1, 0, 0, 1, 19.854048, 0)">
+      <title>Line 1</title>
+      <rect x="192" y="339.814" width="640" height="96" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0);" rx="48" ry="48"/>
+    </g>
+    <g transform="matrix(1, 0, 0, 1, 37.947052, -21.938904)">
+      <title>Line 2</title>
+      <rect x="173.907" y="602.05" width="640" height="96" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0);" rx="48" ry="48"/>
+    </g>
+    <g transform="matrix(1, 0, 0, 1, 19.854048, 480.594177)">
+      <title>Line 3</title>
+      <rect x="192" y="339.814" width="640" height="96" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0);" rx="48" ry="48"/>
+    </g>
+  </g>
+</svg>
