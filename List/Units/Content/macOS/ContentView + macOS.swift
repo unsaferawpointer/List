@@ -12,43 +12,29 @@ import SwiftUI
 
 struct ContentView {
 
-	@Environment(\.modelContext) var modelContext
-
 	@SceneStorage("filter") private var filterSettings: Data?
 
-	@State var selection: Set<PersistentIdentifier> = []
+	// MARK: - SwiftData
 
-	@Query(sort: [SortDescriptor<Item>.byIndex, .byTimestamp]) var items: [Item]
+	@Environment(\.modelContext) var modelContext
 
-	@Query var tags: [Tag]
+	@Query(sort: [SortDescriptor<Item>.byIndex, .byTimestamp])	var items:	[Item]
+	@Query(sort: [SortDescriptor<Tag>.byIndex, .byTimestamp])	var tags:	[Tag]
 
-	@State var scrollPosition: PersistentIdentifier?
-
-	let textFactory = TextFactory()
+	// MARK: - Presentation
 
 	@State private var isFilterPopoverPresented: Bool = false
+
+	// MARK: - Model
+
+	@State var model = ContentModel()
 }
 
 // MARK: - Computed Properties
 extension ContentView {
 
 	var filter: Binding<Filter> {
-		Binding {
-			guard let data = filterSettings, let result = try? JSONDecoder().decode(Filter.self, from: data) else {
-				return Filter()
-			}
-			return Filter(
-				completionState: result.completionState,
-				includedTag: result.includedTag.intersection(tags.map(\.uuid)),
-				excludedTag: result.excludedTag.intersection(tags.map(\.uuid))
-			)
-		} set: { newValue in
-			guard let data = try? JSONEncoder().encode(newValue) else {
-				filterSettings = nil
-				return
-			}
-			filterSettings = data
-		}
+		model.filter(from: $filterSettings, tags: tags)
 	}
 }
 
@@ -75,8 +61,14 @@ extension ContentView: View {
 						.safeAreaPadding(.init(top: 34, leading: 0, bottom: 0, trailing: 0))
 					}
 				}
-			.navigationTitle(textFactory.makeTitle(filter: filter.wrappedValue, tags: tags))
-			.navigationSubtitle(textFactory.makeSubtitle(filter: filter.wrappedValue, tags: tags, itemsCount: filteredItemsCount))
+				.navigationTitle(model.title(for: filter.wrappedValue, tags: tags))
+				.navigationSubtitle(
+					model.subtitle(
+						for: filter.wrappedValue,
+						tags: tags,
+						itemsCount: items.count
+					)
+				)
 			.toolbar {
 				buildToolbar()
 			}
@@ -84,7 +76,7 @@ extension ContentView: View {
 				\.deleteAction,
 				 ButtonAction<DeleteAction>(
 					title: ContentLocalization.Menu.delete,
-					isEnabled: !selection.isEmpty
+					isEnabled: model.actionsIsEnabled
 				 ) {
 					 deleteSelectedItems()
 				 }
@@ -93,26 +85,10 @@ extension ContentView: View {
 				\.completionAction,
 				 ToggleAction(
 					title: ContentLocalization.Menu.completed,
-					isEnabled: !selection.isEmpty,
-					source: completionSources(for: selection)
+					isEnabled: model.actionsIsEnabled,
+					source: model.completionSources(for: items)
 				 )
 			)
-		}
-	}
-}
-
-// MARK: - Binding
-private extension ContentView {
-
-	func completionSources(for selected: Set<PersistentIdentifier>) -> [Binding<Bool>] {
-		return items.filter { item in
-			selected.contains(item.id)
-		}.map { item in
-			Binding {
-				item.isCompleted
-			} set: { newValue in
-				item.isCompleted = newValue
-			}
 		}
 	}
 }
@@ -130,15 +106,14 @@ private extension ContentView {
 				allTags: tags
 			)
 			withAnimation {
-				scrollPosition = id
+				model.scrollPosition = id
 			}
 		}
 	}
 
 	func deleteSelectedItems() {
 		withAnimation {
-			DataManager.deleteItems(selection, in: modelContext, all: items)
-			selection.removeAll()
+			model.deleteItems(in: modelContext, items: items)
 		}
 	}
 
@@ -176,39 +151,39 @@ private extension ContentView {
 	@ViewBuilder
 	func buildContent() -> some View {
 		ScrollViewReader { proxy in
-			List(selection: $selection) {
+			List(selection: $model.selection) {
 				ItemsSection(
 					filter: filter.wrappedValue,
-					selection: $selection
+					selection: $model.selection
 				) { item in
 					ItemView(item: item) { text in
 						withAnimation {
-							DataManager.updateItem(item, with: text, in: modelContext)
+							model.updateItem(item, with: text, in: modelContext)
 						}
 					}
 					.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
 					.listRowSeparator(.hidden)
 				} onMove: { ids, destination in
 					withAnimation {
-						DataManager.moveItems(ids, to: destination, in: modelContext, all: items)
+						model.moveItems(ids, to: destination, in: modelContext, all: items)
 					}
 				}
 			}
 			.contextMenu(forSelectionType: PersistentIdentifier.self) { selected in
 				buildMenu(for: selected)
 			}
-			.onChange(of: scrollPosition) { oldValue, newValue in
+			.onChange(of: model.scrollPosition) { oldValue, newValue in
 				guard oldValue != newValue else {
 					return
 				}
-				proxy.scrollTo(scrollPosition, anchor: .bottom)
+				proxy.scrollTo(model.scrollPosition, anchor: .bottom)
 			}
 		}
 	}
 
 	@ViewBuilder
 	func buildMenu(for selected: Set<PersistentIdentifier>) -> some View {
-		Toggle(sources: completionSources(for: selected), isOn: \.self) {
+		Toggle(sources: model.completionSources(for: items), isOn: \.self) {
 			Text(ContentLocalization.Menu.completed)
 		}
 		.keyboardShortcut(.return, modifiers: .command)
@@ -220,7 +195,9 @@ private extension ContentView {
 		}
 		Divider()
 		Button(role: .destructive) {
-			DataManager.deleteItems(selected, in: modelContext, all: items)
+			withAnimation {
+				model.deleteItems(ids: selected, in: modelContext, items: items)
+			}
 		} label: {
 			Label(ContentLocalization.Menu.delete, systemImage: "trash")
 		}
