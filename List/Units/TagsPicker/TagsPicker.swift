@@ -25,10 +25,8 @@ struct TagsPicker {
 	// MARK: - Initialization
 
 	init(items: Set<PersistentIdentifier>, completion: @escaping (Set<PersistentIdentifier>) -> Void) {
-		let predicate = #Predicate<Item> { item in
-			items.contains(item.id)
-		}
-		self._items = Query(filter: predicate, animation: .default)
+		self._items = .concrete(ids: items)
+		self._tags = .visible
 		self.model = Model(selectedItems: items)
 		self.completion = completion
 	}
@@ -99,6 +97,8 @@ struct TagsPicker {
 	@Environment(\.openSettings) private var openSettings
 	@AppStorage("selected-settings-tab") private var selectedSettingsTab = SettingsTab.tags
 
+	// MARK: - SwiftData
+
 	@Environment(\.modelContext) private var modelContext
 
 	@Query private var tags: [Tag]
@@ -108,7 +108,7 @@ struct TagsPicker {
 
 	init(selected: Set<PersistentIdentifier>) {
 		self._items = .concrete(ids: selected)
-		self._tags = .all
+		self._tags = .visible
 	}
 }
 

@@ -13,6 +13,14 @@ extension Query where Element == Tag, Result == [Tag] {
 	static var all: Query<Tag, [Tag]> {
 		Query(sort: [.byIndex, .byTimestamp], animation: .default)
 	}
+
+	static var visible: Query<Tag, [Tag]> {
+		Query(
+			filter: #Predicate<Tag> { tag in !tag.isHidden },
+			sort: [.byIndex, .byTimestamp],
+			animation: .default
+		)
+	}
 }
 
 extension Query where Element == Item, Result == [Item] {
