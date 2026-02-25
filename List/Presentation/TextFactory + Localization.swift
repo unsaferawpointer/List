@@ -18,6 +18,8 @@ protocol TextFactoryLocalizable {
 	var navigationTitleDefault: String { get }
 
 	func navigationSubtitle(for itemsCount: Int) -> String
+
+	func navigationTitle(for excludedList: [String]) -> String
 }
 
 extension TextFactory {
@@ -46,5 +48,10 @@ extension TextFactory.LocalizationFactory: TextFactoryLocalizable {
 
 	func navigationSubtitle(for itemsCount: Int) -> String {
 		String(localized: "items.count.subtitle \(itemsCount)", table: "CommonLocalizable")
+	}
+
+	func navigationTitle(for excludedList: [String]) -> String {
+		let suffix = excludedList.joined(separator: ", ")
+		return String(localized: "navigation.title.excluded \(suffix)", table: "CommonLocalizable")
 	}
 }

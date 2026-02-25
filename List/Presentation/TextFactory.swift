@@ -31,15 +31,34 @@ extension TextFactory {
 			return localizationService.navigationTitleCompleted
 		case .incomplete:
 			return localizationService.navigationTitleIncomplete
-		case let .singleTag(tag):
-			return tag.title
+		case let .include(tags, _):
+			return tags.map(\.title).joined(separator: ", ")
+		case let .exclude(tags, _):
+			return localizationService.navigationTitle(for: tags.map(\.title))
 		default:
 			return localizationService.navigationTitleDefault
 		}
 	}
 
 	func makeSubtitle(filter: Filter, tags: [Tag], itemsCount: Int) -> String {
-		return localizationService.navigationSubtitle(for: itemsCount)
+
+		let suffix = localizationService.navigationSubtitle(for: itemsCount)
+
+		let condition = condition(filter: filter, tags: tags)
+
+		switch condition {
+		case .all, .completed, .incomplete:
+			return suffix
+		case .include, .exclude, .mixed:
+			return switch filter.completionState {
+			case .include:
+				[localizationService.navigationTitleCompleted, suffix].joined(separator: ": ")
+			case .exlude:
+				[localizationService.navigationTitleIncomplete, suffix].joined(separator: ": ")
+			case .any:
+				suffix
+			}
+		}
 	}
 }
 
@@ -66,13 +85,16 @@ private extension TextFactory {
 			return .completed
 		case (0, 0, .exlude):
 			return .incomplete
-		case (1, 0, .any):
-			guard let tag = includedTags.first else {
-				fatalError()
-			}
-			return .singleTag(tag)
+		case (1..., 0, _):
+			return .include(tags: includedTags, completion: filter.completionState)
+		case (0, 1..., _):
+			return .exclude(tags: excludedTags, completion: filter.completionState)
 		default:
-			return .other
+			return .mixed(
+				include: includedTags,
+				exclude: excludedTags,
+				completion: filter.completionState
+			)
 		}
 	}
 }
@@ -84,7 +106,8 @@ private extension TextFactory {
 		case all
 		case completed
 		case incomplete
-		case singleTag(_ tag: Tag)
-		case other
+		case include(tags: [Tag], completion: Filter.MatchType)
+		case exclude(tags: [Tag], completion: Filter.MatchType)
+		case mixed(include: [Tag], exclude: [Tag], completion: Filter.MatchType)
 	}
 }
