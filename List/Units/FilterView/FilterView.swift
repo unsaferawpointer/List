@@ -44,18 +44,6 @@ struct FilterView: View {
 						}
 					}
 				}
-
-				if !filter.isEmpty {
-					Button {
-						filter = Filter()
-					} label: {
-						HStack {
-							Spacer()
-							Text(FilterLocalization.Footer.clear)
-							Spacer()
-						}
-					}
-				}
 			}
 			.formStyle(.grouped)
 			.scrollIndicators(.hidden)
@@ -64,10 +52,26 @@ struct FilterView: View {
 			.navigationBarTitleDisplayMode(.inline)
 			#endif
 			.toolbar {
+				if !filter.isEmpty {
+					ToolbarItem(placement: .cancellationAction) {
+						Button(role: .destructive) {
+							filter = Filter()
+							dismiss()
+						} label: {
+							HStack {
+								Spacer()
+								Text(FilterLocalization.Footer.clear)
+								Spacer()
+							}
+						}
+						.controlSize(.extraLarge)
+					}
+				}
 				ToolbarItem(placement: .confirmationAction) {
 					Button(FilterLocalization.Toolbar.done) {
 						dismiss()
 					}
+					.controlSize(.extraLarge)
 				}
 			}
 		}

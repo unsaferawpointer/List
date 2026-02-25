@@ -69,6 +69,10 @@ extension ContentView: View {
 						itemsCount: items.count
 					)
 				)
+				.sheet(isPresented: $isFilterPopoverPresented) {
+					FilterView(filter: filter)
+						.presentationDetents([.medium, .large])
+				}
 			.toolbar {
 				buildToolbar()
 			}
@@ -207,19 +211,15 @@ private extension ContentView {
 	@ToolbarContentBuilder
 	func buildToolbar() -> some ToolbarContent {
 		ToolbarItem(placement: .automatic) {
-				Button {
-					isFilterPopoverPresented = true
-				} label: {
-					Label(
-						FilterLocalization.NavigationBar.title,
-						systemImage: filter.wrappedValue.isEmpty
-							? "line.3.horizontal.decrease.circle"
-							: "line.3.horizontal.decrease.circle.fill"
-					)
-			}
-			.popover(isPresented: $isFilterPopoverPresented, arrowEdge: .bottom) {
-				FilterView(filter: filter)
-					.presentationDetents([.medium, .large])
+			Button {
+				isFilterPopoverPresented = true
+			} label: {
+				Label(
+					FilterLocalization.NavigationBar.title,
+					systemImage: filter.wrappedValue.isEmpty
+					? "line.3.horizontal.decrease.circle"
+					: "line.3.horizontal.decrease.circle.fill"
+				)
 			}
 		}
 		ToolbarItem(placement: .primaryAction) {
