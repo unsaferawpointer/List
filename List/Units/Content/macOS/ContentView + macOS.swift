@@ -66,7 +66,7 @@ extension ContentView: View {
 					model.subtitle(
 						for: filter.wrappedValue,
 						tags: tags,
-						itemsCount: items.count
+						itemsCount: filteredItemsCount
 					)
 				)
 				.sheet(isPresented: $isFilterPopoverPresented) {
